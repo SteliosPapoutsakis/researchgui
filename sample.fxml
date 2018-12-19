@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TabPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.GuiController">
+   <tabs>
+      <Tab fx:id="stateInputsTab" text="State inputs">
+         <content>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                     <items>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="21.0">
+                           <children>
+                              <HBox prefHeight="20.0" prefWidth="200.0" />
+                              <RadioButton fx:id="varRadio" layoutX="276.0" layoutY="12.0" mnemonicParsing="false" onAction="#radioVarReg" text="Variable" />
+                              <RadioButton fx:id="regRadio" layoutX="276.0" layoutY="32.0" mnemonicParsing="false" onAction="#radioVarReg" text="Register" />
+                              <Spinner fx:id="sizeInOutSpinner" editable="true" layoutX="377.0" layoutY="29.0" prefHeight="1.0" prefWidth="52.0" />
+                              <Label layoutX="347.0" layoutY="33.0" prefHeight="17.0" prefWidth="45.0" text="Size:" />
+                              <Label layoutX="436.0" layoutY="33.0" text="Name:" />
+                              <TextField fx:id="nameVarRegTextBox" layoutX="472.0" layoutY="28.0" prefHeight="25.0" prefWidth="115.0" />
+                              <Button fx:id="inputInOutButton" layoutX="506.0" layoutY="57.0" mnemonicParsing="false" onAction="#InputButton" text="Input" />
+                              <Button fx:id="clearInOutButton" layoutX="379.0" layoutY="57.0" mnemonicParsing="false" onAction="#clearInputButton" text="Clear " />
+                              <Button fx:id="nextInOutButton" layoutX="444.0" layoutY="57.0" mnemonicParsing="false" onAction="#nextInputButton" text="Next" />
+                              <Label layoutX="10.0" layoutY="32.0" prefHeight="17.0" prefWidth="52.0" text="FSM Title:" />
+                              <TextField fx:id="title" layoutX="62.0" layoutY="28.0" prefHeight="25.0" prefWidth="101.0" />
+                              <Button fx:id="clearallInOutButton" layoutX="308.0" layoutY="57.0" mnemonicParsing="false" onAction="#clearAllinputButton" text="Clear all" />
+                              <Button fx:id="InputTitleButton" layoutX="74.0" layoutY="57.0" mnemonicParsing="false" onAction="#InputtitleButton" text="Input" />
+                              <ComboBox fx:id="inputOutputMenu" layoutX="171.0" layoutY="28.0" onAction="#typeSelect" prefHeight="26.0" prefWidth="86.0" promptText="Type" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <Label layoutX="3.0" layoutY="15.0" prefHeight="20.0" prefWidth="64.0" text="State Num:" />
+                              <Label layoutX="145.0" layoutY="17.0" text="Var/Reg Name:" />
+                              <TextField fx:id="NameAssignmentsTextBox" layoutX="239.0" layoutY="13.0" prefHeight="25.0" prefWidth="81.0" />
+                              <Label layoutX="331.0" layoutY="17.0" prefHeight="17.0" prefWidth="35.0" text="Assign" />
+                              <TextField fx:id="Assign1TextBox" layoutX="380.0" layoutY="13.0" prefHeight="25.0" prefWidth="65.0" />
+                              <TextField fx:id="Assign2TextBox" layoutX="492.0" layoutY="13.0" prefHeight="25.0" prefWidth="65.0" />
+                              <Label fx:id="Operator" layoutX="456.0" layoutY="17.0" text="Label" />
+                              <Button fx:id="inputAssignButton" layoutX="524.0" layoutY="48.0" mnemonicParsing="false" onAction="#inputAssign" text="Input" />
+                              <Button fx:id="nextAssignButton" layoutX="463.0" layoutY="48.0" mnemonicParsing="false" onAction="#nextAssign" text="Next" />
+                              <Button fx:id="holdButton" layoutX="338.0" layoutY="48.0" mnemonicParsing="false" onAction="#holdAssign" text="Hold" />
+                              <Button fx:id="holdStateButton" layoutX="244.0" layoutY="48.0" mnemonicParsing="false" onAction="#holdStateAssign" text="Hold state" />
+                              <Button fx:id="clearAssginButton" layoutX="401.0" layoutY="48.0" mnemonicParsing="false" onAction="#clearAssign" text="Clear" />
+                              <Spinner fx:id="stateNumSpinner" layoutX="73.0" layoutY="13.0" onMouseClicked="#clickSpin" prefHeight="1.0" prefWidth="52.0" />
+                              <ComboBox fx:id="operatorsMenu" layoutX="24.0" layoutY="48.0" onAction="#operation" prefWidth="150.0" promptText="Operation" />
+                           </children>
+                        </AnchorPane>
+                     </items>
+                  </SplitPane>
+                  <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                     <items>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <RadioButton fx:id="conditionRadio" layoutX="14.0" layoutY="15.0" mnemonicParsing="false" onAction="#radioCondition" text="Condition" />
+                              <Label fx:id="fLabel" layoutX="23.0" layoutY="48.0" text="If" />
+                              <TextField fx:id="conditionTextbox" layoutX="43.0" layoutY="44.0" prefHeight="25.0" prefWidth="75.0" />
+                              <ComboBox fx:id="conditionMenu" layoutX="245.0" layoutY="44.0" onAction="#conditionselect" prefHeight="25.0" prefWidth="108.0" promptText="Conditional" />
+                              <Label layoutX="377.0" layoutY="23.0" text="Next State Num" />
+                              <Button fx:id="conditionInputButton" layoutX="503.0" layoutY="36.0" mnemonicParsing="false" onAction="#buttonClick" onMouseClicked="#inputCondition" text="Input" />
+                              <Button fx:id="conditionNextButton" layoutX="504.0" layoutY="2.0" mnemonicParsing="false" onAction="#nextCondition" text="Next" />
+                              <Button fx:id="conditionClearButton" layoutX="503.0" layoutY="70.0" mnemonicParsing="false" onAction="#clearCondition" text="Clear" />
+                              <Spinner fx:id="conditionSpinner" layoutX="394.0" layoutY="44.0" prefHeight="1.0" prefWidth="52.0" />
+                              <TextField fx:id="conditiontext2" layoutX="166.0" layoutY="44.0" prefHeight="13.0" prefWidth="72.0" />
+                              <Label fx:id="conditionLabel" layoutX="126.0" layoutY="48.0" text="Label" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <Button fx:id="generateButton" layoutX="513.0" layoutY="26.0" mnemonicParsing="false" onAction="#generate" prefHeight="45.0" prefWidth="71.0" text="Generate" />
+                              <Button fx:id="deletStateButton" layoutX="317.0" layoutY="26.0" mnemonicParsing="false" onAction="#deleteStateButton" prefHeight="45.0" prefWidth="85.0" text="Delete State" />
+                              <CheckBox fx:id="generateTestBenchCheckBox" layoutX="14.0" layoutY="63.0" mnemonicParsing="false" text="Generate Test Bench" />
+                              <Button fx:id="saevFSMButton" layoutX="220.0" layoutY="26.0" mnemonicParsing="false" onAction="#saveButton" prefHeight="45.0" prefWidth="71.0" text="Save FSM" />
+                              <TextField fx:id="loadTextbox" layoutX="112.0" layoutY="24.0" prefHeight="25.0" prefWidth="98.0" />
+                              <Button fx:id="loadFSMButton" layoutX="24.0" layoutY="24.0" mnemonicParsing="false" onAction="#loadButton" prefHeight="25.0" prefWidth="74.0" text="Load FSM" />
+                              <Button fx:id="loadStateButton" layoutX="422.0" layoutY="26.0" mnemonicParsing="false" onAction="#loadStateButton" prefHeight="45.0" prefWidth="74.0" text="Load State" />
+                           </children>
+                        </AnchorPane>
+                     </items>
+                  </SplitPane>
+               </children>
+            </VBox>
+         </content>
+      </Tab>
+      <Tab  text="FSM Drawing">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <ScrollPane prefHeight="402.0" prefWidth="600.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="396.0" prefWidth="598.0">
+                           <children>
+                              <Canvas fx:id="canvas" height="399.0" width="600.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+   </tabs>
+</TabPane>
