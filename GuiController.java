@@ -174,13 +174,14 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
-
+    @FXML
+    protected Tab tabFSM;
 
 
     @FXML
         //inputing values
     void InputButton(ActionEvent event) {
-        //this.canvas.getGraphicsContext2D().fillOval(200,400,890,200);
+
         //checking to see if stuff is input
         if (this.nameVarRegTextBox.getText().length() > 0 &&
                 (this.varRadio.isSelected() || this.regRadio.isSelected())) {

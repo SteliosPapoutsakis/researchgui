@@ -3,6 +3,8 @@ package sample;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableListBase;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,11 +27,15 @@ public class Main extends Application {
         //getting the controller
         GuiController controller = loader.getController();
 
+
+
         //setting up all the intial values of GUI objects, starting with conditional menu
         controller.conditionMenu.getItems().add("Greater than");
         controller.conditionMenu.getItems().add("Equal to");
         controller.conditionMenu.getItems().add("Not Equal to");
         controller.conditionMenu.getItems().add("Less than");
+
+        controller.tabFSM.setOnSelectionChanged(new tablistener());
 
         //input output reg
         controller.inputOutputMenu.getItems().add("Input");
