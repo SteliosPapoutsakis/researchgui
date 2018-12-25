@@ -32,6 +32,7 @@ public class GuiController {
     private ArrayList<String> assigns = new ArrayList<>();
     protected Hashtable<String, String> assigmentState;
     protected Hashtable<String, Integer> conditionsState;
+    protected ArrayList<DrawState> states = new ArrayList<>();
 
 
     private int indexInput = 0;
@@ -172,7 +173,7 @@ public class GuiController {
 
 
     @FXML
-    private Canvas canvas;
+    protected Canvas canvas;
 
     @FXML
     protected Tab tabFSM;
@@ -367,6 +368,8 @@ public class GuiController {
             condition2 = this.conditiontext2.getText();
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
+            // add the next state to the drawing fsm to be drawn
+            this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
         }
 
@@ -375,6 +378,8 @@ public class GuiController {
 
         this.conditionTextbox.clear();
         this.conditiontext2.clear();
+        // add the next state to the drawing fsm to be drawn
+        this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
 
     }
 
@@ -1009,6 +1014,9 @@ br.close();
             this.Assign1TextBox.clear();
             this.Assign2TextBox.setVisible(false);
             this.Operator.setVisible(false);
+
+            //add this state to draw state
+            this.states.add(new DrawState(50*state + 50,state,new ArrayList<>()));
             //if the state exists and there is a new output,
             //make sure it is in the hashmap
         } else {

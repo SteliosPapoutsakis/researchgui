@@ -1,21 +1,14 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableListBase;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Observable;
 
 public class Main extends Application {
 
@@ -35,7 +28,11 @@ public class Main extends Application {
         controller.conditionMenu.getItems().add("Not Equal to");
         controller.conditionMenu.getItems().add("Less than");
 
-        controller.tabFSM.setOnSelectionChanged(new tablistener());
+        //controller.canvas.setWidth(3000);
+
+        controller.tabFSM.setOnSelectionChanged(new TabListener(controller.tabFSM,
+                controller.canvas.getGraphicsContext2D(),controller.states));
+
 
         //input output reg
         controller.inputOutputMenu.getItems().add("Input");
@@ -74,6 +71,7 @@ public class Main extends Application {
         //intiatting hastablles for state 0
         controller.conditions.put(0,new Hashtable<>());
         controller.assignments.put(0,new Hashtable<>());
+        controller.states.add(new DrawState(50,0,new ArrayList<Integer>()));
         controller.assigmentState = controller.assignments.get(0);
         controller.conditionsState = controller.conditions.get(0);
 
