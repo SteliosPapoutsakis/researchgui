@@ -12,6 +12,9 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
+import Framework.RunProgram;
+
+
 public class GuiController {
 /***
  * BUG: if you add a new output it deletes all the vlaues of the state assign
@@ -56,7 +59,6 @@ public class GuiController {
 
     @FXML
     protected ComboBox<String> inputOutputMenu;
-
 
 
     @FXML
@@ -169,7 +171,6 @@ public class GuiController {
 
     @FXML
     private Button loadStateButton;
-
 
 
     @FXML
@@ -408,6 +409,10 @@ public class GuiController {
             this.Operator.setVisible(true);
             this.Assign2TextBox.setVisible(true);
             this.Operator.setText("-");
+        } else if (this.operatorsMenu.getValue().equals("&&")) {
+            this.Operator.setVisible(true);
+            this.Assign2TextBox.setVisible(true);
+            this.Operator.setText("&&");
         }
     }
 
@@ -535,7 +540,6 @@ public class GuiController {
         //putting in everything in format
 
 
-
 //        System.out.println(this.inputs);
 //        System.out.println(this.outputs);
 //        System.out.println(this.registers);
@@ -544,7 +548,7 @@ public class GuiController {
 //        System.out.println(this.assigmentState);
 //        System.out.println(this.conditionsState);
 
-        StringBuilder string = new StringBuilder("start FSM\n");
+        StringBuilder string = new StringBuilder("Start FSM\n");
         string.append("input ");
         for (String input : this.inputs) {
             string.append("Size " + this.variableSize.get(input) + " " + this.variableType.get(input) + " " + input + " ");
@@ -582,6 +586,8 @@ public class GuiController {
 
 
         System.out.println(string);
+        RunProgram run = new RunProgram();
+        run.run(this.fsmTitle, string.toString());
     }
 
     @FXML
@@ -642,8 +648,7 @@ public class GuiController {
                 Integer.parseInt(assign2);
             } catch (NumberFormatException e) {
                 if (!(this.inputs.contains(assign2) || this.registers.contains(assign2) || this.outputs.contains(assign2))
-                        && this.Assign2TextBox.isVisible())
-                         {
+                        && this.Assign2TextBox.isVisible()) {
                     Warnings w = new Warnings("This Register/Var doesn't exist", "Input Error");
                     Thread t = new Thread(w);
                     t.run();
@@ -658,9 +663,9 @@ public class GuiController {
 
             String type = "";
             String type2 = "";
-            if(this.variableType.containsKey(assign1))
+            if (this.variableType.containsKey(assign1))
                 type = this.variableType.get(assign1) + " ";
-            if(this.variableType.containsKey(assign2))
+            if (this.variableType.containsKey(assign2))
                 type2 = this.variableType.get(assign2) + " ";
 
             this.assigmentState.put(reg, type + assign1 + " " + op + " " + type2 + " " + assign2);
@@ -685,102 +690,84 @@ public class GuiController {
             br.readLine();
             String str = br.readLine();
             //deletes begining inputs
-            str = str.substring(str.indexOf('S'),str.length());
-            while(str.charAt(0) == 'S') {
+            str = str.substring(str.indexOf('S'), str.length());
+            while (str.charAt(0) == 'S') {
                 str = str.replaceAll(" ", "");
-                String size = str.substring(4,5);
-                String type = str.substring(5,8);
-                str = str.substring(4,str.length());
-                String name ="";
-                if(str.contains("Size"))
-                {
+                String size = str.substring(4, 5);
+                String type = str.substring(5, 8);
+                str = str.substring(4, str.length());
+                String name = "";
+                if (str.contains("Size")) {
                     int index = str.indexOf("Size");
-                    name = str.substring(4,index);
-                }
-                else{
-                    name = str.substring(4,str.length());
+                    name = str.substring(4, index);
+                } else {
+                    name = str.substring(4, str.length());
                 }
                 this.inputs.add(name);
-                this.variableType.put(name,type);
-                this.variableSize.put(name,Integer.parseInt(size));
-                str = str.substring(str.indexOf(name.charAt(name.length()-1)),str.length());
+                this.variableType.put(name, type);
+                this.variableSize.put(name, Integer.parseInt(size));
+                str = str.substring(str.indexOf(name.charAt(name.length() - 1)), str.length());
 
             }
             //read outputs
             str = br.readLine();
-            str = str.substring(str.indexOf('S'),str.length());
-            while(str.charAt(0) == 'S') {
+            str = str.substring(str.indexOf('S'), str.length());
+            while (str.charAt(0) == 'S') {
                 str = str.replaceAll(" ", "");
-                String size = str.substring(4,5);
-                String type = str.substring(5,8);
-                str = str.substring(4,str.length());
-                String name ="";
-                if(str.contains("Size"))
-                {
+                String size = str.substring(4, 5);
+                String type = str.substring(5, 8);
+                str = str.substring(4, str.length());
+                String name = "";
+                if (str.contains("Size")) {
                     int index = str.indexOf("Size");
-                    name = str.substring(4,index);
-                }
-                else{
-                    name = str.substring(4,str.length());
+                    name = str.substring(4, index);
+                } else {
+                    name = str.substring(4, str.length());
                 }
                 this.outputs.add(name);
-                this.variableType.put(name,type);
-                this.variableSize.put(name,Integer.parseInt(size));
-                str = str.substring(str.indexOf(name.charAt(name.length()-1)),str.length());
+                this.variableType.put(name, type);
+                this.variableSize.put(name, Integer.parseInt(size));
+                str = str.substring(str.indexOf(name.charAt(name.length() - 1)), str.length());
 
             }
             str = br.readLine();
-            while(!(str.equals("End FSM")))
-            {
-                this.stateNumbers.add(Integer.parseInt(str.substring(6,str.length())));
-                this.assignments.put(Integer.parseInt(str.substring(6,str.length())), new Hashtable<>());
-                this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6,str.length())));
+            while (!(str.equals("End FSM"))) {
+                this.stateNumbers.add(Integer.parseInt(str.substring(6, str.length())));
+                this.assignments.put(Integer.parseInt(str.substring(6, str.length())), new Hashtable<>());
+                this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6, str.length())));
 
                 str = br.readLine();
-                while(!str.contains("Next State"))
-                {
-                    str.replace(" ","");
-                  if(str.charAt(0) == 'S')
-                  {
-                      String size = str.substring(4,5);
-                      String type = str.substring(5,8);
-                      String name = str.substring(8,str.indexOf("="));
-                      if(str.contains("+"))
-                      {
+                while (!str.contains("Next State")) {
+                    str.replace(" ", "");
+                    if (str.charAt(0) == 'S') {
+                        String size = str.substring(4, 5);
+                        String type = str.substring(5, 8);
+                        String name = str.substring(8, str.indexOf("="));
+                        if (str.contains("+")) {
 
-                      }
-                      else if(str.contains("-"))
-                      {
+                        } else if (str.contains("-")) {
 
-                      }
-                      else if(str.contains("/"))
-                      {
+                        } else if (str.contains("/")) {
 
-                      }
-                      else if(str.contains("*"))
-                      {
+                        } else if (str.contains("*")) {
 
-                      }
+                        }
 
 
-
-
-                  }
+                    }
 
                 }
             }
-br.close();
+            br.close();
 
 
-        } catch(FileNotFoundException e)
-        {
-            Warnings fail = new Warnings("File not found","error");
+        } catch (FileNotFoundException e) {
+            Warnings fail = new Warnings("File not found", "error");
             Thread t = new Thread(fail);
             t.run();
             return;
-        } catch(IOException e)
-        {
-            Warnings fail = new Warnings("Error reading","error");
+        } catch (IOException e) {
+            Warnings fail = new Warnings("Error reading", "error");
             Thread t = new Thread(fail);
             t.run();
             return;
@@ -851,7 +838,7 @@ br.close();
             }
             //break the substrings
             condition1 = str.substring(0, str.indexOf(label.charAt(0)));
-            condition2 = str.substring(str.indexOf(label.charAt(label.length()-1)) + 1, str.length());
+            condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length());
             this.conditiontext2.setText(condition2);
             this.conditionLabel.setText(label);
             this.conditionTextbox.setText(condition1);
@@ -1016,7 +1003,7 @@ br.close();
             this.Operator.setVisible(false);
 
             //add this state to draw state
-            this.states.add(new DrawState(50*state + 50,state,new ArrayList<>()));
+            this.states.add(new DrawState(50 * state + 50, state, new ArrayList<>()));
             //if the state exists and there is a new output,
             //make sure it is in the hashmap
         } else {
@@ -1057,14 +1044,24 @@ br.close();
 
         char inQuestion = '+';
         boolean containAny = false;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             if (str.contains(inQuestion + "")) {
+                int indexcut = str.indexOf(inQuestion) + 1;
+                String additionToOpp = "";
+                //fixes the issue of adding the double '&'
+                if (inQuestion == '&')
+                {
+                    indexcut++;
+                    additionToOpp = "&";
+                }
                 containAny = true;
                 String str1 = str.substring(0, str.indexOf(inQuestion));
-                String str2 = str.substring(str.indexOf(inQuestion) + 1, str.length());
+                String str2 = str.substring(indexcut, str.length());
 
                 this.Assign1TextBox.setText(str1);
-                this.Operator.setText(inQuestion + "");
+
+
+                this.Operator.setText(inQuestion + additionToOpp);
                 this.Assign2TextBox.setText(str2);
                 this.Operator.setVisible(true);
                 this.Assign2TextBox.setVisible(true);
@@ -1074,14 +1071,17 @@ br.close();
             // do for all chars
 
             switch (i) {
-                case 1:
+                case 0:
                     inQuestion = '-';
                     break;
-                case 2:
+                case 1:
                     inQuestion = '*';
                     break;
-                case 3:
+                case 2:
                     inQuestion = '/';
+                    break;
+                case 3:
+                    inQuestion = '&';
                     break;
             }
         }
