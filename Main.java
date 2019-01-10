@@ -31,7 +31,7 @@ public class Main extends Application {
         //controller.canvas.setWidth(3000);
 
         controller.tabFSM.setOnSelectionChanged(new TabListener(controller.tabFSM,
-                controller.canvas.getGraphicsContext2D(),controller.states));
+                controller.canvas.getGraphicsContext2D(),controller.states,controller.conditions));
 
 
         //input output reg

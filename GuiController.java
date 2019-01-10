@@ -370,7 +370,7 @@ public class GuiController {
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
             // add the next state to the drawing fsm to be drawn
-            this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
+          //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
         }
 
@@ -380,7 +380,7 @@ public class GuiController {
         this.conditionTextbox.clear();
         this.conditiontext2.clear();
         // add the next state to the drawing fsm to be drawn
-        this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
+        //this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
 
     }
 
@@ -1006,6 +1006,8 @@ public class GuiController {
             this.states.add(new DrawState(50 * state + 50, state, new ArrayList<>()));
             //if the state exists and there is a new output,
             //make sure it is in the hashmap
+
+
         } else {
             int state = this.stateNumSpinner.getValue();
             for (String str : this.assigns) {

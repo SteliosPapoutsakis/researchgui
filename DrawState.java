@@ -27,6 +27,11 @@ public class DrawState {
     private int y = 65;
     private final static int raduis = 50;
     private final static javafx.scene.paint.Paint color = Color.BLUE;
+
+    public int getStateNum() {
+        return stateNum;
+    }
+
     private int stateNum;
     private ArrayList<Integer> nextStates;
 
