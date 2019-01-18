@@ -35,7 +35,7 @@ public class TabListener implements EventHandler<Event> {
         if (this.fsm.isSelected())
         {
 
-          this.fsmDrawing.draw(this.drawings,this.g);
+          this.fsmDrawing.draw(this.drawings,this.g,this.conditionsMap);
 //
 //            DrawState sate1 = this.drawings.get(0);
 //            DrawState sate2 = this.drawings.get(7);

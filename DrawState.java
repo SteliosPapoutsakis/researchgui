@@ -18,7 +18,7 @@ public class DrawState {
         return y+ raduis/2;}
 
     public static int getRaduis() {
-        return raduis; }
+        return raduis/2; }
 
     public ArrayList<Integer> getNextStates() {
         return this.nextStates;
@@ -26,6 +26,8 @@ public class DrawState {
 
     private int y = 65;
     private final static int raduis = 50;
+
+
     private final static javafx.scene.paint.Paint color = Color.BLUE;
 
     public int getStateNum() {
@@ -39,12 +41,12 @@ public class DrawState {
         this.x = x;
         this.stateNum = statNum;
         this.nextStates = nextStates;
+        if (this.stateNum % 2 != 0)
+            this.y = 250;
     }
 
     public void DrawStatecircle(GraphicsContext g) {
         g.setFill(this.color);
-        if (this.stateNum % 2 != 0)
-            this.y = 250;
         g.fillOval(this.x, y, raduis, raduis);
 
 
