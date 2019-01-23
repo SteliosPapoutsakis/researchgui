@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
+import javafx.scene.text.Font;
 import org.omg.CORBA.MARSHAL;
 
 import javax.swing.*;
@@ -14,8 +15,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 public class drawFSM {
-    private final int CANVIS_WIDTH = 600;
-    private final int CANVIS_HIEGHT = 410;
+    private final static int CANVIS_WIDTH = 600;
+    private final static int CANVIS_HIEGHT = 410;
 
 
     public void draw(ArrayList<DrawState> drawStates, GraphicsContext g,
@@ -23,7 +24,7 @@ public class drawFSM {
 
 
         //clears the canvis for new drawing
-       // g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
+        // g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
         for (DrawState state : drawStates) {
             for (int nextState : conditionsMap.get(state.getStateNum()).values()) {
                 //if the next state has been defined yet, dont draw it
@@ -39,10 +40,11 @@ public class drawFSM {
             }
         }
 
+        drawLegend(g);
+
         for (DrawState state : drawStates) {
             state.DrawStatecircle(g);
         }
-
 
 
     }
@@ -51,6 +53,7 @@ public class drawFSM {
     public static void drawArc(DrawState state1, DrawState state2, GraphicsContext g) {
         //draws a loop if the state1 == state2
         if (state1.getStateNum() == state2.getStateNum()) {
+            g.setStroke(Color.BLACK);
             g.strokeArc(state1.getX(), state1.getY() - 50, 30, 45, 0, 360, ArcType.OPEN);
             return;
         }
@@ -59,27 +62,35 @@ public class drawFSM {
         int y = getY(state1, state2);
         int x = state1.getX();
         int height = (state1.getY() - y) * 2;
-        int width = (state2.getX() ) - (
+        int width = (state2.getX()) - (
                 state1.getX());
         int startAngle = 0;
         int arcExtend = 180;
         if (state1.getStateNum() > state2.getStateNum()) {
-            x = state2.getX() ;
+            x = state2.getX();
             startAngle = 180;
-            width = (state1.getX()  - (
+            width = (state1.getX() - (
                     state2.getX()));
+            g.setStroke(Color.RED);
 
         }
+        else
+            g.setStroke(Color.BLACK);
 
         g.strokeArc(x, y, width, height, startAngle, arcExtend, ArcType.OPEN);
-        drawTinyArrowArc(state1,state2,width,y,height,g);
 
 
-        }
+
+    }
 
     //to draw a line between states on differet y axis
     public static void drawLine(DrawState state1, DrawState state2, GraphicsContext g) {
+        if (state1.getStateNum() > state2.getStateNum())
+            g.setStroke(Color.RED);
+        else
+            g.setStroke(Color.BLACK);
         g.strokeLine(state1.getX(), state1.getY(), state2.getX(), state2.getY());
+
     }
 
     public static int getY(DrawState state1, DrawState state2) {
@@ -92,21 +103,31 @@ public class drawFSM {
     }
 
     //purpose is to draw the tiny arrow to signify direction
-    public static void drawTinyArrowArc(DrawState state1, DrawState state2,int width, int y,int height,
+    public static void drawTinyArrowArc(DrawState state1, DrawState state2, int width, int y, int height,
                                         GraphicsContext g) {
         g.setStroke(Color.RED);
-        if(state1.getStateNum() > state2.getStateNum())
-        {
-            int mainx = width/2 + state2.getX();
-            g.strokeLine(mainx,y+height,mainx+5,y+height-6);
-            g.strokeLine(mainx,y+height,mainx+5,y+height+6);
-        }
-        else if(state1.getStateNum()< state2.getStateNum()){
-            int mainx = width/2 + state1.getX();
-            g.strokeLine(mainx,y,mainx-5,y-6);
-            g.strokeLine(mainx,y,mainx-5,y+6);
+        if (state1.getStateNum() > state2.getStateNum()) {
+            int mainx = width / 2 + state2.getX();
+            g.strokeLine(mainx, y + height, mainx + 5, y + height - 6);
+            g.strokeLine(mainx, y + height, mainx + 5, y + height + 6);
+        } else if (state1.getStateNum() < state2.getStateNum()) {
+            int mainx = width / 2 + state1.getX();
+            g.strokeLine(mainx, y, mainx - 5, y - 6);
+            g.strokeLine(mainx, y, mainx - 5, y + 6);
         }
         g.setStroke(Color.BLACK);
+    }
+
+    public void drawLegend(GraphicsContext g) {
+        g.setLineWidth(.8);
+        g.setStroke(Color.BLACK);
+        g.setFont(new Font(10));
+        g.strokeText("Legend", 25, CANVIS_HIEGHT - 76);
+        g.strokeLine(5, CANVIS_HIEGHT - 63, 12, CANVIS_HIEGHT - 63);
+        g.strokeText("= Lower State to Greater State", 15, CANVIS_HIEGHT - 60);
+        g.setStroke(Color.RED);
+        g.strokeLine(5, CANVIS_HIEGHT - 53, 12, CANVIS_HIEGHT - 53);
+        g.strokeText("= Greater State to Lower State", 15, CANVIS_HIEGHT - 50);
     }
 
 }
