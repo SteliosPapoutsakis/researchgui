@@ -28,7 +28,7 @@ public class GuiController {
     protected HashMap<Integer, Hashtable<String, Integer>> conditions = new HashMap<>();
     protected HashMap<Integer, Hashtable<String, String>> assignments = new HashMap<>();
     private HashMap<String, Integer> variableSize = new HashMap<>();
-    private HashMap<String, String> variableType = new HashMap<>();
+    protected HashMap<String, String> variableType = new HashMap<>();
     private ArrayList<String> inputs = new ArrayList<>();
     private ArrayList<String> outputs = new ArrayList<>();
     private ArrayList<String> registers = new ArrayList<>();

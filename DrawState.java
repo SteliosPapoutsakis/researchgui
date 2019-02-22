@@ -54,4 +54,16 @@ public class DrawState {
         g.fillText("S" + this.stateNum, this.x + 7, y + 25);
 
     }
+
+    //method too see if an (x,y) is located within the state
+    public boolean Contains(int x, int y)
+    {
+        if(x >= this.x && x<= this.x + raduis)
+        {
+            if(y >= this.y && y <= this.y + raduis)
+                return true;
+        }
+        return false;
+    }
+
 }
