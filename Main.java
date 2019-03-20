@@ -31,9 +31,12 @@ public class Main extends Application {
             //set on click listener for canvis
             controller.canvas.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
                 for (DrawState state : controller.states) {
+
+                //looking to see if the state was clicked
                     if (state.Contains((int) e.getX(), (int) e.getY())) {
                         String stateAssignemts = "";
                         Hashtable<String, String> a = controller.assignments.get(state.getStateNum());
+                     //getting all the assigments
                         for (String str : a.keySet()) {
                             stateAssignemts = stateAssignemts + controller.variableType.get(str) + " " +
                                     str + " = " + a.get(str) + "\n";

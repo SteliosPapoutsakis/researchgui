@@ -1003,7 +1003,10 @@ public class GuiController {
             this.Operator.setVisible(false);
 
             //add this state to draw state
-            this.states.add(new DrawState(50 * state + 50, state, new ArrayList<>()));
+            //adjust to use the first row first
+            int statefactor = (state>25)?state-26:state;
+
+            this.states.add(new DrawState(100 * statefactor + 50, state, new ArrayList<>()));
             //if the state exists and there is a new output,
             //make sure it is in the hashmap
 

@@ -17,7 +17,8 @@ import java.util.Hashtable;
 public class drawFSM {
     private final static int CANVIS_WIDTH = 600;
     private final static int CANVIS_HIEGHT = 410;
-
+    private static ArrayList<Integer> xarrows = new ArrayList<Integer>();
+    private static ArrayList<Integer> yarrows = new ArrayList<Integer>();
 
     public void draw(ArrayList<DrawState> drawStates, GraphicsContext g,
                      HashMap<Integer, Hashtable<String, Integer>> conditionsMap) {
@@ -30,8 +31,7 @@ public class drawFSM {
                 //if the next state has been defined yet, dont draw it
                 if (nextState > drawStates.size()) continue;
                 // if both the states are on the same line
-                if (state.getStateNum() % 2 == 0 && nextState % 2 == 0 || state.getStateNum() % 2 == 1 &&
-                        nextState % 2 == 1) {
+                if (state.getStateNum() < 26) {
                     drawArc(state, drawStates.get(nextState), g);
                 } else {
                     drawLine(state, drawStates.get(nextState), g);
@@ -45,6 +45,14 @@ public class drawFSM {
         for (DrawState state : drawStates) {
             state.DrawStatecircle(g);
         }
+        g.setStroke(Color.GREEN);
+        for(int i = 0; i < xarrows.size();i+=4)
+        {
+            g.strokeLine(xarrows.get(i),yarrows.get(i),xarrows.get(i+1),yarrows.get(i+1));
+            g.strokeLine(xarrows.get(i+2),yarrows.get(i+2),xarrows.get(i+3),yarrows.get(i+3));
+        }
+
+
 
 
     }
@@ -63,21 +71,41 @@ public class drawFSM {
         int x = state1.getX();
         int height = (state1.getY() - y) * 2;
         int width = (state2.getX()) - (
-                state1.getX());
+                state1.getX()) -DrawState.getRaduis();
         int startAngle = 0;
         int arcExtend = 180;
         if (state1.getStateNum() > state2.getStateNum()) {
-            x = state2.getX();
+            x = state2.getX() +DrawState.getRaduis();
             startAngle = 180;
-            width = (state1.getX() - (
-                    state2.getX()));
+            width = (state1.getX() -  (
+                    state2.getX())-DrawState.getRaduis());
             g.setStroke(Color.RED);
+            g.strokeArc(x, y, width, height, startAngle, arcExtend, ArcType.OPEN);
+
+            //work around to draw arrows on circle states
+            xarrows.add(x);
+            xarrows.add(x+4);
+            xarrows.add(x);
+            xarrows.add(x-2);
+            yarrows.add(state1.getY());
+            yarrows.add(state1.getY()+5);
+            yarrows.add(state1.getY());
+            yarrows.add(state1.getY()+5);
+
+
+
+
 
         }
-        else
+        else{
             g.setStroke(Color.BLACK);
+            g.strokeArc(x, y, width, height, startAngle, arcExtend, ArcType.OPEN);
+            double[] xs = {x+width,x+width-1,x+width-4};
+            double[] ys = {state2.getY(),state2.getY()-4,state2.getY()-4};
+            g.fillPolygon(xs,ys,3);
+        }
 
-        g.strokeArc(x, y, width, height, startAngle, arcExtend, ArcType.OPEN);
+
 
 
 
@@ -95,8 +123,8 @@ public class drawFSM {
 
     public static int getY(DrawState state1, DrawState state2) {
         // equation to make the max point of arc 10 pixels higher per state jumped
-        int y = -10 * (int) (Math.abs(state1.getStateNum() / 2.0 - state2.getStateNum() / 2.0) - 1)
-                + state1.getY() - DrawState.getRaduis() / 2;
+        int y = -10 * (int) (Math.abs(state1.getStateNum()  - state2.getStateNum()) - 1)
+                + state1.getY() - DrawState.getRaduis();
         if (y < 0)
             return 0;
         return y;

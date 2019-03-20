@@ -41,7 +41,7 @@ public class DrawState {
         this.x = x;
         this.stateNum = statNum;
         this.nextStates = nextStates;
-        if (this.stateNum % 2 != 0)
+        if (this.stateNum > 25)
             this.y = 250;
     }
 
