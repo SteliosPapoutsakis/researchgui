@@ -24,7 +24,7 @@ public class DrawState {
         return this.nextStates;
     }
 
-    private int y = 65;
+    private int y;
     private final static int raduis = 50;
 
 
@@ -39,10 +39,11 @@ public class DrawState {
 
     public DrawState(int x, int statNum, ArrayList<Integer> nextStates) {
         this.x = x;
+        this.y = (nextStates.size() > 26 && statNum < 26)?65:
+                (nextStates.size() > 25 && statNum > 26)?250:150;
         this.stateNum = statNum;
         this.nextStates = nextStates;
-        if (this.stateNum > 25)
-            this.y = 250;
+
     }
 
     public void DrawStatecircle(GraphicsContext g) {
