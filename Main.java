@@ -109,7 +109,7 @@ public class Main extends Application {
             //intiatting hastablles for state 0
             controller.conditions.put(0, new Hashtable<>());
             controller.assignments.put(0, new Hashtable<>());
-            controller.states.add(new DrawState(50, 0, new ArrayList<Integer>()));
+            controller.states.add(new DrawState(50, 0));
             controller.assigmentState = controller.assignments.get(0);
             controller.conditionsState = controller.conditions.get(0);
 

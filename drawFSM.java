@@ -24,7 +24,7 @@ public class drawFSM {
 
 
         //clears the canvis for new drawing
-        // g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
+         g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
         for (DrawState state : drawStates) {
             for (int nextState : conditionsMap.get(state.getStateNum()).values()) {
                 //if the next state has been defined yet, dont draw it
@@ -108,6 +108,16 @@ public class drawFSM {
         return y;
     }
 
+
+
+    //need to draw the direction arrows for states connected between lines
+    public double[] getSlopeYint(DrawState state1,DrawState state2){
+        double[] a = new double[2];
+        a[0] = ((double)state2.getY()-state1.getY())/(state2.getX()-state1.getX());
+        a[1] = state2.getY()/(a[0]*state2.getX());
+        return a;
+
+    }
 }
 
 
