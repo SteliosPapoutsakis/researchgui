@@ -184,7 +184,7 @@ public class GuiController {
         //inputing values
     void InputButton(ActionEvent event) {
 
-        //checking to see if stuff is input
+        //checking to see if input
         if (this.nameVarRegTextBox.getText().length() > 0 &&
                 (this.varRadio.isSelected() || this.regRadio.isSelected())) {
 
@@ -204,6 +204,7 @@ public class GuiController {
                     this.inputs.add(this.nameVarRegTextBox.getText());
                 this.variableType.put(this.nameVarRegTextBox.getText(), "Var");
                 this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
+            //check if output
             } else if (this.inputOutputMenu.getValue().equals("Output")) {
 
                 //check if a name is a dublicate
@@ -225,6 +226,7 @@ public class GuiController {
                     this.outputs.add(this.nameVarRegTextBox.getText());
                 if (this.varRadio.isSelected()) {
                     this.variableType.put(this.nameVarRegTextBox.getText(), "Var");
+
 
                 } else {
 
@@ -267,6 +269,7 @@ public class GuiController {
                     this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
                 }
                 this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
+            //check if reg
             } else if (this.inputOutputMenu.getValue().equals("Register")) {
 
                 //check if a name is a dublicate
@@ -287,7 +290,7 @@ public class GuiController {
                     this.registers.add(this.nameVarRegTextBox.getText());
 
 
-// go through all regs to see if same size
+                  // go through all regs to see if same size
                 for (String str : this.registers) {
                     if (str.equals(this.nameVarRegTextBox.getText())) continue;
                     if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
@@ -591,6 +594,7 @@ public class GuiController {
     }
 
     @FXML
+    //assigns the value of the register to itself, a "hold state"
     void holdAssign(ActionEvent event) {
         this.assigmentState.put(this.NameAssignmentsTextBox.getText(), this.NameAssignmentsTextBox.getText());
         assignPutData();
@@ -684,6 +688,7 @@ public class GuiController {
 
     @FXML
     void loadButton(ActionEvent event) {
+        //THIS IS NOT DONE, trying to load info from a text value, might finish in future:)
         String file = loadTextbox.getText();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));

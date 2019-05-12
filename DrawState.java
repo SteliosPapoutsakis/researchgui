@@ -46,7 +46,6 @@ public class DrawState {
     }
 
     public void DrawStatecircle(GraphicsContext g) {
-        this.updateY();
         g.setFill(this.color);
         g.fillOval(this.x, y, raduis, raduis);
 
@@ -70,7 +69,6 @@ public class DrawState {
 
 //this is necessary to adjust the y component if two rows are need for states
     public void updateY(){
-        if(!this.twoRows) return;
         this.y = (this.stateNum < 26)?65:this.y;
     }
 

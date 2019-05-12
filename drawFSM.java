@@ -22,11 +22,17 @@ public class drawFSM {
     public void draw(ArrayList<DrawState> drawStates, GraphicsContext g,
                      HashMap<Integer, Hashtable<String, Integer>> conditionsMap) {
 
-
+//need to call this to update the y value when switching to two row layout
+        if(drawStates.size() > 26)
+        {
+            for(DrawState state: drawStates)
+                state.updateY();
+        }
         //clears the canvis for new drawing
          g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
         for (DrawState state : drawStates) {
             for (int nextState : conditionsMap.get(state.getStateNum()).values()) {
+
                 //if the next state has been defined yet, dont draw it
                 if (nextState > drawStates.size()) continue;
                 // if both the states are on the same line
@@ -91,8 +97,13 @@ public class drawFSM {
 
     //to draw a line between states on differet y axis
     public static void drawLine(DrawState state1, DrawState state2, GraphicsContext g) {
-        if (state1.getStateNum() > state2.getStateNum())
+        if (state1.getStateNum() > state2.getStateNum()) {
             g.setStroke(Color.RED);
+            getSlope(state1,state2);
+            double centerX = state2.getX() + Math.abs(state1.getX()-state2.getX())/2;
+            double centerY = (state2.getY()+state1.getY())/2;
+            g.strokeLine(centerX,centerY,centerX-5,centerY-5);
+        }
         else
             g.setStroke(Color.BLACK);
         g.strokeLine(state1.getX(), state1.getY(), state2.getX(), state2.getY());
@@ -107,17 +118,22 @@ public class drawFSM {
             return 0;
         return y;
     }
+// needed to draw the arrows when the states are between 2 rows
+    public static int getSlope(DrawState state1, DrawState state2)
+    {
+        // this is for whichever state is on top
+        //if the two states are more less 26 appart we know we want the slope to be neg
 
+        int truNum = (state1.getStateNum() < state2.getStateNum())?-1:1;
 
-
-    //need to draw the direction arrows for states connected between lines
-    public double[] getSlopeYint(DrawState state1,DrawState state2){
-        double[] a = new double[2];
-        a[0] = ((double)state2.getY()-state1.getY())/(state2.getX()-state1.getX());
-        a[1] = state2.getY()/(a[0]*state2.getX());
-        return a;
+        int xDiff = Math.abs(state1.getX()-state2.getX());
+        int yDIff = (state2.getY() > state1.getY())?state2.getY()-state1.getY():state1.getY()-state2.getY();
+        return truNum * yDIff/xDiff;
 
     }
+
+
+
 }
 
 
