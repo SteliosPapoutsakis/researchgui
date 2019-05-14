@@ -27,16 +27,19 @@ public class drawFSM {
         {
             for(DrawState state: drawStates)
                 state.updateY();
+
+
         }
         //clears the canvis for new drawing
-         g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
+        g.clearRect(0, 0, CANVIS_WIDTH, CANVIS_HIEGHT);
         for (DrawState state : drawStates) {
             for (int nextState : conditionsMap.get(state.getStateNum()).values()) {
 
                 //if the next state has been defined yet, dont draw it
                 if (nextState > drawStates.size()) continue;
                 // if both the states are on the same line
-                if (state.getStateNum() < 26) {
+                if ((state.getStateNum() < 26 && drawStates.get(nextState).getStateNum()< 26)
+                        ||(state.getStateNum() > 25 && drawStates.get(nextState).getStateNum() > 25)) {
                     drawArc(state, drawStates.get(nextState), g);
                 } else {
                     drawLine(state, drawStates.get(nextState), g);
@@ -97,16 +100,24 @@ public class drawFSM {
 
     //to draw a line between states on differet y axis
     public static void drawLine(DrawState state1, DrawState state2, GraphicsContext g) {
+        boolean isLowToHigh;
+        double[] function = getLinearFunction(state1,state2);
+        double centerX;
+        double centerY =  (state2.getY()+state1.getY())/2;
         if (state1.getStateNum() > state2.getStateNum()) {
             g.setStroke(Color.RED);
-            getSlope(state1,state2);
-            double centerX = state2.getX() + Math.abs(state1.getX()-state2.getX())/2;
-            double centerY = (state2.getY()+state1.getY())/2;
-            g.strokeLine(centerX,centerY,centerX-5,centerY-5);
+            centerX = state2.getX() + Math.abs(state1.getX()-state2.getX())/2;
+            isLowToHigh = false;
+
         }
-        else
+        else {
+            centerX = state1.getX() + Math.abs(state1.getX()-state2.getX())/2;
             g.setStroke(Color.BLACK);
+            isLowToHigh = true;
+        }
         g.strokeLine(state1.getX(), state1.getY(), state2.getX(), state2.getY());
+        drawDirectionalArrows(g,function,isLowToHigh,centerX,centerY);
+
 
     }
 
@@ -119,16 +130,56 @@ public class drawFSM {
         return y;
     }
 // needed to draw the arrows when the states are between 2 rows
-    public static int getSlope(DrawState state1, DrawState state2)
+    public static double[] getLinearFunction(DrawState state1, DrawState state2)
     {
         // this is for whichever state is on top
         //if the two states are more less 26 appart we know we want the slope to be neg
+        double[] function = new double[2];
+        int truNum;
 
-        int truNum = (state1.getStateNum() < state2.getStateNum())?-1:1;
+        if(state1.getStateNum() < state2.getStateNum())
+            truNum = (state1.getStateNum()+26 < state2.getStateNum())?-1:1;
+        else
+            truNum = (state2.getStateNum()+26 < state1.getStateNum())?-1:1;
 
-        int xDiff = Math.abs(state1.getX()-state2.getX());
-        int yDIff = (state2.getY() > state1.getY())?state2.getY()-state1.getY():state1.getY()-state2.getY();
-        return truNum * yDIff/xDiff;
+        double xDiff = Math.abs(state1.getX()-state2.getX());
+        double yDIff = (state2.getY() > state1.getY())?state2.getY()-state1.getY()
+                :state1.getY()-state2.getY();
+        function[0] = truNum * yDIff/xDiff;
+
+        //getting the y intercept, also needing to adjust because (0,0) is in TOP LEFT not BOTTOM LEFT
+
+        int uupdatedY = CANVIS_HIEGHT-state1.getY();
+        function[1] = uupdatedY-function[0]*state1.getX();
+
+
+        return function;
+
+    }
+
+// purpose is to draw the directional arrows for next state transitions that occur from states
+    //between 2 rows
+    public static void drawDirectionalArrows(GraphicsContext g, double[] function, boolean lowToHigh
+    ,double xCenter,double yCenter)
+    {
+        double xNew = (lowToHigh)?xCenter-5:xCenter+5;
+        double updatedY = function[0] * (xNew) + function[1];
+        updatedY = CANVIS_HIEGHT-updatedY;
+        double runGain = xNew-xCenter;
+        double riseGain = yCenter-updatedY;
+        double radius = Math.sqrt(runGain*runGain+riseGain*riseGain);
+        double theta = Math.atan(riseGain/runGain);
+        theta = (runGain > 0)?Math.PI*2+theta:Math.PI+theta;
+
+
+        double updatedX0 = radius * Math.cos(theta+Math.PI/6);
+        double updatedY0 = radius * Math.sin(theta+Math.PI/6);
+
+        double updatedX1 = radius * Math.cos(theta-Math.PI/6);
+        double updatedY1 = radius * Math.sin(theta-Math.PI/6);
+
+        g.strokeLine(xCenter,yCenter,xCenter+updatedX0,yCenter-updatedY0);
+        g.strokeLine(xCenter,yCenter,xCenter+updatedX1,yCenter-updatedY1);
 
     }
 

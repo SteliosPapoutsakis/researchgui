@@ -17,7 +17,6 @@ import Framework.RunProgram;
 
 public class GuiController {
 /***
- * BUG: if you add a new output it deletes all the vlaues of the state assign
  * if you edit a outptut/reg it will cicle and extra time
  */
     /***
@@ -43,7 +42,8 @@ public class GuiController {
     private int indexRegister = 0;
     private int indexAssign = 0;
     private int indexConditions = 0;
-    private int indexStates = 0;
+    private boolean didEdit =false;
+    private String fsmSTRING;
 
     /**
      * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -183,6 +183,7 @@ public class GuiController {
     @FXML
         //inputing values
     void InputButton(ActionEvent event) {
+
 
         //checking to see if input
         if (this.nameVarRegTextBox.getText().length() > 0 &&
@@ -346,6 +347,7 @@ public class GuiController {
         this.indexInput = 0;
         this.indexOutput = 0;
         this.indexRegister = 0;
+        this.didEdit = true;
 
 
         if (!this.assigns.isEmpty())
@@ -358,6 +360,7 @@ public class GuiController {
     void InputtitleButton(ActionEvent event) {
         if (event.getSource().equals(this.InputTitleButton) && this.title.getText().length() > 0)
             this.fsmTitle = this.title.getText();
+        this.didEdit=true;
 
     }
 
@@ -372,6 +375,7 @@ public class GuiController {
             condition2 = this.conditiontext2.getText();
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
+            this.didEdit=true;
             // add the next state to the drawing fsm to be drawn
           //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
@@ -382,6 +386,7 @@ public class GuiController {
 
         this.conditionTextbox.clear();
         this.conditiontext2.clear();
+        this.didEdit=true;
         // add the next state to the drawing fsm to be drawn
         //this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
 
@@ -451,6 +456,7 @@ public class GuiController {
         }
 
         this.nameVarRegTextBox.clear();
+        this.didEdit=true;
 
 
     }
@@ -463,6 +469,7 @@ public class GuiController {
         this.Assign1TextBox.clear();
         this.Operator.setVisible(false);
         this.Assign2TextBox.setVisible(false);
+        this.didEdit=true;
 
     }
 
@@ -480,6 +487,7 @@ public class GuiController {
         } else {
             this.conditionsState.remove("NOCON");
         }
+        this.didEdit=true;
 
 
     }
@@ -530,6 +538,7 @@ public class GuiController {
             }
 
         }
+        this.didEdit=true;
 
     }
 
@@ -540,16 +549,18 @@ public class GuiController {
 
     @FXML
     void generate(ActionEvent event) {
-        //putting in everything in format
+        if(!this.didEdit)
+            this.fsmSTRING = generateFunction();
+        RunProgram run = new RunProgram();
+        run.run(this.fsmTitle, this.fsmSTRING);
 
 
-//        System.out.println(this.inputs);
-//        System.out.println(this.outputs);
-//        System.out.println(this.registers);
-//        System.out.println(this.variableSize);
-//        System.out.println(this.variableType);
-//        System.out.println(this.assigmentState);
-//        System.out.println(this.conditionsState);
+
+
+    }
+    //putting in everything in format
+    public String generateFunction()
+    {
 
         StringBuilder string = new StringBuilder("Start FSM\n");
         string.append("input ");
@@ -586,11 +597,8 @@ public class GuiController {
             string.append("End\n");
         }
         string.append("End FSM");
+        return string.toString();
 
-
-        System.out.println(string);
-        RunProgram run = new RunProgram();
-        run.run(this.fsmTitle, string.toString());
     }
 
     @FXML
@@ -737,31 +745,50 @@ public class GuiController {
             }
             str = br.readLine();
             while (!(str.equals("End FSM"))) {
-                this.stateNumbers.add(Integer.parseInt(str.substring(6, str.length())));
-                this.assignments.put(Integer.parseInt(str.substring(6, str.length())), new Hashtable<>());
-                this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6, str.length())));
+                if(!(Integer.parseInt(str.substring(6,7))==0)) {
+                    this.stateNumbers.add(Integer.parseInt(str.substring(6, 7)));
+                    this.assignments.put(Integer.parseInt(str.substring(6, 7)), new Hashtable<>());
+                    this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6, 7)));
+                }
 
                 str = br.readLine();
                 while (!str.contains("Next State")) {
-                    str.replace(" ", "");
+                    str = str.replace(" ", "");
+                    String name = str.substring(3, str.indexOf("="));
                     if (str.charAt(0) == 'S') {
                         String size = str.substring(4, 5);
                         String type = str.substring(5, 8);
-                        String name = str.substring(8, str.indexOf("="));
-                        if (str.contains("+")) {
-
-                        } else if (str.contains("-")) {
-
-                        } else if (str.contains("/")) {
-
-                        } else if (str.contains("*")) {
-
-                        }
-
-
+                        name = str.substring(8, str.indexOf("="));
+                        this.registers.add(name);
+                        this.variableSize.put(name, Integer.parseInt(size));
+                        this.variableType.put(type, type);
                     }
+                    String assgin0;
+                    String assgin1 = "";
+                    String op = str.contains("*") ? "*" :
+                            (str.contains("+") ? "+" : (str.contains("-") ? "-" :
+                                    (str.contains("/") ? "/" :
+                                            (str.contains("&&") ? "&&"
+                                                    : ""))));
+                    if (op.length() == 0) {
+                        assgin0 = str.substring(str.indexOf("=") + 1, str.length());
+                        assgin0 = assgin0.replaceAll("Reg", "Reg ");
+                        assgin0 = assgin0.replaceAll("Var", "Var ");
+                        this.assigmentState.put(name, assgin0);
 
+                    } else {
+                        assgin0 = str.substring(str.indexOf("=") + 1, str.indexOf(op));
+                        assgin1 = str.substring(str.indexOf(op) + op.length(), str.length());
+                        assgin0 = assgin0.replaceAll("Reg", "Reg ");
+                        assgin0 = assgin0.replaceAll("Var", "Var ");
+                        assgin1 = assgin1.replaceAll("Reg", "Reg ");
+                        assgin1 = assgin1.replaceAll("Var", "Var ");
+                        this.assigmentState.put(name, assgin0 + " " + op + " "+assgin1);
+                    }
+                    str = br.readLine();
                 }
+
+
             }
             br.close();
 
