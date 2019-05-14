@@ -105,13 +105,15 @@ public class drawFSM {
         double centerX;
         double centerY =  (state2.getY()+state1.getY())/2;
         if (state1.getStateNum() > state2.getStateNum()) {
+            double staringX = (state1.getX() > state2.getX())? state2.getX():state1.getX();
             g.setStroke(Color.RED);
-            centerX = state2.getX() + Math.abs(state1.getX()-state2.getX())/2;
+            centerX = staringX + Math.abs(state1.getX()-state2.getX())/2;
             isLowToHigh = false;
 
         }
         else {
-            centerX = state1.getX() + Math.abs(state1.getX()-state2.getX())/2;
+            double staringX = (state1.getX() > state2.getX())? state2.getX():state1.getX();
+            centerX = staringX + Math.abs(state1.getX()-state2.getX())/2;
             g.setStroke(Color.BLACK);
             isLowToHigh = true;
         }
