@@ -31,9 +31,12 @@ public class Main extends Application {
             //set on click listener for canvis
             controller.canvas.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
                 for (DrawState state : controller.states) {
+
+                //looking to see if the state was clicked
                     if (state.Contains((int) e.getX(), (int) e.getY())) {
                         String stateAssignemts = "";
                         Hashtable<String, String> a = controller.assignments.get(state.getStateNum());
+                     //getting all the assigments
                         for (String str : a.keySet()) {
                             stateAssignemts = stateAssignemts + controller.variableType.get(str) + " " +
                                     str + " = " + a.get(str) + "\n";
@@ -97,7 +100,7 @@ public class Main extends Application {
             //set visiablity
             controller.Operator.setVisible(false);
             controller.Assign2TextBox.setVisible(false);
-            controller.conditionTextbox.setVisible(false);
+            controller.conditionRegSelect.setVisible(false);
             controller.conditionMenu.setVisible(false);
             controller.fLabel.setVisible(false);
             controller.conditionLabel.setVisible(false);
@@ -106,7 +109,7 @@ public class Main extends Application {
             //intiatting hastablles for state 0
             controller.conditions.put(0, new Hashtable<>());
             controller.assignments.put(0, new Hashtable<>());
-            controller.states.add(new DrawState(50, 0, new ArrayList<Integer>()));
+            controller.states.add(new DrawState(50, 0));
             controller.assigmentState = controller.assignments.get(0);
             controller.conditionsState = controller.conditions.get(0);
 

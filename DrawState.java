@@ -10,6 +10,8 @@ import java.util.Hashtable;
 public class DrawState {
     private int x;
 
+    private static boolean twoRows = false;
+
     public int getX() {
         return x + raduis/2;
     }
@@ -20,11 +22,9 @@ public class DrawState {
     public static int getRaduis() {
         return raduis/2; }
 
-    public ArrayList<Integer> getNextStates() {
-        return this.nextStates;
-    }
 
-    private int y = 65;
+
+    private int y;
     private final static int raduis = 50;
 
 
@@ -34,15 +34,19 @@ public class DrawState {
         return stateNum;
     }
 
-    private int stateNum;
-    private ArrayList<Integer> nextStates;
+    public void setStateNum(int stateNum) {
+        this.stateNum = stateNum;
+    }
 
-    public DrawState(int x, int statNum, ArrayList<Integer> nextStates) {
+    private int stateNum;
+
+
+    public DrawState(int x, int statNum) {
         this.x = x;
+        this.y = (statNum > 25)?250:150;
+        if(statNum > 25) twoRows = true;
         this.stateNum = statNum;
-        this.nextStates = nextStates;
-        if (this.stateNum % 2 != 0)
-            this.y = 250;
+
     }
 
     public void DrawStatecircle(GraphicsContext g) {
@@ -64,6 +68,12 @@ public class DrawState {
                 return true;
         }
         return false;
+    }
+
+
+//this is necessary to adjust the y component if two rows are need for states
+    public void updateY(){
+        this.y = (this.stateNum < 26)?65:this.y;
     }
 
 }
