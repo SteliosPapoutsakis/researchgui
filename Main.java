@@ -100,7 +100,7 @@ public class Main extends Application {
             //set visiablity
             controller.Operator.setVisible(false);
             controller.Assign2TextBox.setVisible(false);
-            controller.conditionTextbox.setVisible(false);
+            controller.conditionRegSelect.setVisible(false);
             controller.conditionMenu.setVisible(false);
             controller.fLabel.setVisible(false);
             controller.conditionLabel.setVisible(false);

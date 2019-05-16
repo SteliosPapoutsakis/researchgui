@@ -34,6 +34,10 @@ public class DrawState {
         return stateNum;
     }
 
+    public void setStateNum(int stateNum) {
+        this.stateNum = stateNum;
+    }
+
     private int stateNum;
 
 

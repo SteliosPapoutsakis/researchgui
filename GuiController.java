@@ -60,6 +60,9 @@ public class GuiController {
     @FXML
     protected ComboBox<String> inputOutputMenu;
 
+    @FXML
+    protected ComboBox<String> conditionRegSelect;
+
 
     @FXML
     private RadioButton varRadio;
@@ -200,6 +203,12 @@ public class GuiController {
                     return;
                 }
 
+                //if a one bit value, add to the list of conditional values
+                if(this.sizeInOutSpinner.getValue() == 1)
+                {
+                    this.conditionRegSelect.getItems().addAll("Var " + this.nameVarRegTextBox.getText());
+                }
+
                 //puts values of an input in tables and arrayList
                 if (!this.inputs.contains(this.nameVarRegTextBox.getText()))
                     this.inputs.add(this.nameVarRegTextBox.getText());
@@ -268,8 +277,11 @@ public class GuiController {
                         }
                     }
                     this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
+                    //put the reg in the conditional values
+                    this.conditionRegSelect.getItems().addAll("Reg " + this.nameVarRegTextBox.getText());
                 }
                 this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
+
             //check if reg
             } else if (this.inputOutputMenu.getValue().equals("Register")) {
 
@@ -330,6 +342,7 @@ public class GuiController {
                 }
 
                 this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
+                this.conditionRegSelect.getItems().addAll("Reg " + this.nameVarRegTextBox.getText());
                 this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
 
             }
@@ -370,8 +383,7 @@ public class GuiController {
         String condition2 = "";
         //if radio button is selected
         if (this.conditionRadio.isSelected()) {
-            condition1 = this.conditionTextbox.getText();
-            condition1 = this.variableType.get(condition1) + " " + condition1;
+            condition1 = this.conditionRegSelect.getValue();
             condition2 = this.conditiontext2.getText();
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
@@ -384,11 +396,9 @@ public class GuiController {
         this.conditionsState.put(condition1 + " " + this.conditionLabel.getText()
                 + " " + condition2, this.conditionSpinner.getValue());
 
-        this.conditionTextbox.clear();
         this.conditiontext2.clear();
         this.didEdit=true;
         // add the next state to the drawing fsm to be drawn
-        //this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
 
     }
 
@@ -479,7 +489,7 @@ public class GuiController {
         if (this.conditionRadio.isSelected()) {
             String condition1 = "";
             String condition2 = "";
-            condition1 = this.conditionTextbox.getText();
+            condition1 = this.conditionRegSelect.getValue();
 
             condition2 = this.conditiontext2.getText();
             this.conditionsState.remove(condition1 + " " + this.conditionLabel.getText()
@@ -544,15 +554,39 @@ public class GuiController {
 
     @FXML
     void deleteStateButton(ActionEvent event) {
+        //for every state ahead edit the number to be one state smaller
+        int size = states.size();
+        for(int i = stateNumSpinner.getValue()+1; i < size;i++)
+        {
+            this.assignments.put(i-1,this.assignments.get(i));
+            this.conditions.put(i-1,this.conditions.get(i));
+            this.states.get(i).setStateNum(i-1);
+
+        }
+
+        //setting everything up after the deletion
+        this.states.remove(stateNumSpinner.getValue());
+        this.assignments.remove(size-1);
+        this.conditions.remove(size-1);
+        this.assigmentState = this.assignments.get(stateNumSpinner.getValue());
+        this.conditionsState = this.conditions.get(stateNumSpinner.getValue());
+
+        this.indexAssign=-1;
+        this.indexConditions=-1;
+        assignPutData();
+        nextCondition(null);
+        stateNumbers.remove(stateNumbers.size()-1);
 
     }
 
     @FXML
     void generate(ActionEvent event) {
-        if(!this.didEdit)
+        if(this.didEdit)
             this.fsmSTRING = generateFunction();
-        RunProgram run = new RunProgram();
-        run.run(this.fsmTitle, this.fsmSTRING);
+        System.out.println(this.fsmSTRING);
+        this.didEdit=false;
+       // RunProgram run = new RunProgram();
+        //run.run(this.fsmTitle, this.fsmSTRING);
 
 
 
@@ -604,7 +638,8 @@ public class GuiController {
     @FXML
     //assigns the value of the register to itself, a "hold state"
     void holdAssign(ActionEvent event) {
-        this.assigmentState.put(this.NameAssignmentsTextBox.getText(), this.NameAssignmentsTextBox.getText());
+        this.assigmentState.put(this.NameAssignmentsTextBox.getText(), this.variableType.get(this.NameAssignmentsTextBox.getText())+
+        this.NameAssignmentsTextBox.getText());
         assignPutData();
     }
 
@@ -685,6 +720,7 @@ public class GuiController {
             this.Assign2TextBox.clear();
 
             assignPutData();
+            this.didEdit=true;
 
         }
     }
@@ -704,7 +740,7 @@ public class GuiController {
             String str = br.readLine();
             //deletes begining inputs
             str = str.substring(str.indexOf('S'), str.length());
-            while (str.charAt(0) == 'S') {
+            while (str.length() > 0) {
                 str = str.replaceAll(" ", "");
                 String size = str.substring(4, 5);
                 String type = str.substring(5, 8);
@@ -719,13 +755,13 @@ public class GuiController {
                 this.inputs.add(name);
                 this.variableType.put(name, type);
                 this.variableSize.put(name, Integer.parseInt(size));
-                str = str.substring(str.indexOf(name.charAt(name.length() - 1)), str.length());
+                str = str.substring(str.indexOf(name)+name.length(), str.length());
 
             }
             //read outputs
             str = br.readLine();
             str = str.substring(str.indexOf('S'), str.length());
-            while (str.charAt(0) == 'S') {
+            while (str.length() > 0) {
                 str = str.replaceAll(" ", "");
                 String size = str.substring(4, 5);
                 String type = str.substring(5, 8);
@@ -740,15 +776,21 @@ public class GuiController {
                 this.outputs.add(name);
                 this.variableType.put(name, type);
                 this.variableSize.put(name, Integer.parseInt(size));
-                str = str.substring(str.indexOf(name.charAt(name.length() - 1)), str.length());
+                str = str.substring(str.indexOf(name)+name.length(), str.length());
+                this.assigns.add(name);
 
             }
             str = br.readLine();
-            while (!(str.equals("End FSM"))) {
+            while (true) {
                 if(!(Integer.parseInt(str.substring(6,7))==0)) {
+                    int state = Integer.parseInt(str.substring(6,7));
+                    int statefactor = (state>25)?state-26:state;
+                    this.states.add(new DrawState(100 * statefactor + 50, state));
                     this.stateNumbers.add(Integer.parseInt(str.substring(6, 7)));
                     this.assignments.put(Integer.parseInt(str.substring(6, 7)), new Hashtable<>());
                     this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6, 7)));
+                    this.conditions.put(Integer.parseInt(str.substring(6, 7)),new Hashtable<>());
+                    this.conditionsState = this.conditions.get(Integer.parseInt(str.substring(6, 7)));
                 }
 
                 str = br.readLine();
@@ -761,7 +803,8 @@ public class GuiController {
                         name = str.substring(8, str.indexOf("="));
                         this.registers.add(name);
                         this.variableSize.put(name, Integer.parseInt(size));
-                        this.variableType.put(type, type);
+                        this.variableType.put(name, type);
+                        this.assigns.add(name);
                     }
                     String assgin0;
                     String assgin1 = "";
@@ -788,9 +831,43 @@ public class GuiController {
                     str = br.readLine();
                 }
 
+                while(!str.equals("End"))
+                {
+                    str = str.replaceAll(" ","");
+
+                    //if less than 17, this is a non conditional branch
+                    if(str.length() < 17)
+                    {
+                        this.conditionsState.put("NOCON",Integer.parseInt(str.substring(str.length()-1,str.length())));
+                    }
+                    //else there is a conditional branch
+                    else{
+                        str = str.replace("Equals","=");
+                        str = str.replace("NotEquals","~=");
+                        str = str.replace("GreaterThan",">");
+                        str = str.replace("LessThan","<");
+                        int startingIndex = (str.contains("Reg"))?str.indexOf("Reg"):str.indexOf("Var");
+                        this.conditionsState.put(str.substring(startingIndex,str.indexOf("State:")),
+                                Integer.parseInt(str.substring(str.length()-1,str.length())));
+                    }
+                    str = br.readLine();
+                }
+                str = br.readLine();
+                if(str.equals("End FSM")) break;
+
 
             }
             br.close();
+            this.didEdit=true;
+
+            //dispaly the latest assignmeent
+            this.assigmentState = this.assignments.get(0);
+            this.conditionsState = this.conditions.get(0);
+            this.indexAssign = -1;
+            assignPutData();
+            this.indexConditions = -1;
+            nextCondition(null);
+
 
 
         } catch (FileNotFoundException e) {
@@ -814,6 +891,8 @@ public class GuiController {
 
     @FXML
     void nextAssign(ActionEvent event) {
+        if(this.assigmentState.size()==0)
+            return;
         // this method does all the work
         assignPutData();
 
@@ -822,16 +901,19 @@ public class GuiController {
     @FXML
     void nextCondition(ActionEvent event) {
         this.indexConditions++;
-        if (this.indexConditions == this.conditionsState.keySet().size()) {
+        if (this.indexConditions >= this.conditionsState.keySet().size()) {
             this.indexConditions = 0;
         }
+        if(this.conditionsState.size()==0)
+            return;
+
         String str = (String) (this.conditionsState.keySet().toArray())[this.indexConditions];
         if (str.equals("NOCON")) {
             // if NOCON make all the text boxes disapper
 
             this.conditionRadio.setSelected(false);
             this.fLabel.setVisible(false);
-            this.conditionTextbox.setVisible(false);
+            this.conditionRegSelect.setVisible(false);
             this.conditionMenu.setVisible(false);
             this.conditiontext2.setVisible(false);
             this.conditionLabel.setVisible(false);
@@ -842,7 +924,7 @@ public class GuiController {
             if (!this.conditionRadio.isSelected()) {
                 this.conditionRadio.setSelected(true);
                 this.fLabel.setVisible(true);
-                this.conditionTextbox.setVisible(true);
+                this.conditionRegSelect.setVisible(true);
                 this.conditionMenu.setVisible(true);
                 this.conditiontext2.setVisible(true);
                 this.conditionLabel.setVisible(true);
@@ -873,13 +955,13 @@ public class GuiController {
             condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length());
             this.conditiontext2.setText(condition2);
             this.conditionLabel.setText(label);
-            this.conditionTextbox.setText(condition1);
             this.conditionSpinner.getValueFactory().setValue(this.conditionsState.get(str));
         }
 
     }
 
     @FXML
+
         // method purpose is to scroll through already inputed inputs/outpus/registers
     void nextInputButton(ActionEvent event) {
         if (this.inputOutputMenu.getValue().equals("Input") && this.inputs.size() > 0) {
@@ -937,18 +1019,18 @@ public class GuiController {
     void radioCondition(ActionEvent event) {
         // if selected make relative stuff visiable
         if (this.conditionRadio.isSelected()) {
+            this.conditionLabel.setVisible(true);
             this.fLabel.setVisible(true);
-            this.conditionTextbox.setVisible(true);
             this.conditionMenu.setVisible(true);
             this.conditiontext2.setVisible(true);
-            this.conditionLabel.setVisible(true);
+            this.conditionRegSelect.setVisible(true);
 
         } else {
             this.fLabel.setVisible(false);
-            this.conditionTextbox.setVisible(false);
             this.conditionMenu.setVisible(false);
             this.conditiontext2.setVisible(false);
             this.conditionLabel.setVisible(false);
+            this.conditionRegSelect.setVisible(false);
 
         }
 
@@ -995,7 +1077,19 @@ public class GuiController {
     }
 
     @FXML
+    //printing the file to a .txt
     void saveButton(ActionEvent event) {
+        try{
+            PrintWriter print = new PrintWriter(this.fsmTitle);
+            if(this.didEdit)
+                this.fsmSTRING = generateFunction();
+            print.print(this.fsmSTRING);
+            this.didEdit = false;
+        }
+        catch(FileNotFoundException e)
+        {
+
+        }
 
     }
 
@@ -1061,6 +1155,7 @@ public class GuiController {
             this.indexAssign--;
             assignPutData();
         }
+        indexConditions=0;
     }
 
     // ppurpose of method is to fill data boxes for values of outputs/regs
