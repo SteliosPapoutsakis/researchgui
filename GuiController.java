@@ -35,6 +35,7 @@ public class GuiController {
     protected Hashtable<String, String> assigmentState;
     protected Hashtable<String, Integer> conditionsState;
     protected ArrayList<DrawState> states = new ArrayList<>();
+    protected ArrayList<ArrayList<String>> conditionsOrder = new ArrayList<>();
 
 
     private int indexInput = 0;
@@ -50,12 +51,13 @@ public class GuiController {
      */
 
     @FXML
+    protected Spinner<Integer> stateNumSpinner;
+    @FXML
     protected Label conditionLabel;
     @FXML
     protected TextField conditiontext2;
 
-    @FXML
-    private Tab stateInputsTab;
+
 
     @FXML
     protected ComboBox<String> inputOutputMenu;
@@ -80,20 +82,12 @@ public class GuiController {
     @FXML
     private TextField nameVarRegTextBox;
 
-    @FXML
-    private Button inputInOutButton;
 
-    @FXML
-    private Button clearInOutButton;
-
-    @FXML
-    private Button nextInOutButton;
 
     @FXML
     private TextField title;
 
-    @FXML
-    private Button clearallInOutButton;
+
 
     @FXML
     private Button InputTitleButton;
@@ -111,41 +105,17 @@ public class GuiController {
     @FXML
     protected Label Operator;
 
-    @FXML
-    private Button inputAssignButton;
 
-    @FXML
-    private Button nextAssignButton;
 
-    @FXML
-    private Button holdButton;
-
-    @FXML
-    private Button holdStateButton;
-
-    @FXML
-    private Button clearAssginButton;
-
-    @FXML
-    protected Spinner<Integer> stateNumSpinner;
 
     @FXML
     private RadioButton conditionRadio;
 
-    @FXML
-    protected TextField conditionTextbox;
+
 
     @FXML
     protected ComboBox<String> conditionMenu;
 
-    @FXML
-    private Button conditionInputButton;
-
-    @FXML
-    private Button conditionNextButton;
-
-    @FXML
-    private Button conditionClearButton;
 
     @FXML
     protected Spinner<Integer> conditionSpinner;
@@ -153,27 +123,10 @@ public class GuiController {
     @FXML
     protected Label fLabel;
 
-    @FXML
-    private Button generateButton;
-
-    @FXML
-    private Button deletStateButton;
-
-    @FXML
-    private CheckBox generateTestBenchCheckBox;
-
-    @FXML
-    private Button saevFSMButton;
 
     @FXML
     private TextField loadTextbox;
 
-
-    @FXML
-    private Button loadFSMButton;
-
-    @FXML
-    private Button loadStateButton;
 
 
     @FXML
@@ -373,6 +326,7 @@ public class GuiController {
     void InputtitleButton(ActionEvent event) {
         if (event.getSource().equals(this.InputTitleButton) && this.title.getText().length() > 0)
             this.fsmTitle = this.title.getText();
+        this.title.clear();
         this.didEdit=true;
 
     }
@@ -387,12 +341,13 @@ public class GuiController {
             condition2 = this.conditiontext2.getText();
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
-            this.didEdit=true;
+            this.didEdit = true;
             // add the next state to the drawing fsm to be drawn
-          //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
+            //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
         }
-
+        this.conditionsOrder.get(this.stateNumSpinner.getValue()).add(condition1 + " " + this.conditionLabel.getText()
+                + " " + condition2);
         this.conditionsState.put(condition1 + " " + this.conditionLabel.getText()
                 + " " + condition2, this.conditionSpinner.getValue());
 
@@ -585,8 +540,8 @@ public class GuiController {
             this.fsmSTRING = generateFunction();
         System.out.println(this.fsmSTRING);
         this.didEdit=false;
-       // RunProgram run = new RunProgram();
-        //run.run(this.fsmTitle, this.fsmSTRING);
+         RunProgram run = new RunProgram();
+        run.run(this.fsmTitle, this.fsmSTRING);
 
 
 
@@ -618,12 +573,13 @@ public class GuiController {
                         + assgin + " = " + this.assignments.get(state).get(assgin) + "\n");
             }
             String temp = "";
-            for (String condition : this.conditions.get(state).keySet()) {
+            for (String condition : this.conditionsOrder.get(state)) {
 
                 if (condition.equals("NOCON")) {
                     temp = "Next State State:" + this.conditions.get(state).get(condition) + "\n";
-                } else {
-                    string.append("Next State if " + condition +
+                } else if(this.conditions.get(state).containsKey(condition)) {
+                    string.append("Next State if " + condition.replaceAll("Reg","Reg ").
+                            replaceAll("Var","Var ") +
                             " State:" + this.conditions.get(state).get(condition) + "\n");
                 }
             }
@@ -732,7 +688,6 @@ public class GuiController {
 
     @FXML
     void loadButton(ActionEvent event) {
-        //THIS IS NOT DONE, trying to load info from a text value, might finish in future:)
         String file = loadTextbox.getText();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -755,6 +710,7 @@ public class GuiController {
                 this.inputs.add(name);
                 this.variableType.put(name, type);
                 this.variableSize.put(name, Integer.parseInt(size));
+                this.conditionRegSelect.getItems().addAll(type+" "+name);
                 str = str.substring(str.indexOf(name)+name.length(), str.length());
 
             }
@@ -773,6 +729,8 @@ public class GuiController {
                 } else {
                     name = str.substring(4, str.length());
                 }
+                if(type.equals("Reg"))
+                    this.conditionRegSelect.getItems().addAll(type+" "+name);
                 this.outputs.add(name);
                 this.variableType.put(name, type);
                 this.variableSize.put(name, Integer.parseInt(size));
@@ -782,8 +740,8 @@ public class GuiController {
             }
             str = br.readLine();
             while (true) {
-                if(!(Integer.parseInt(str.substring(6,7))==0)) {
-                    int state = Integer.parseInt(str.substring(6,7));
+                int state = Integer.parseInt(str.substring(6,7));
+                if(state!=0) {
                     int statefactor = (state>25)?state-26:state;
                     this.states.add(new DrawState(100 * statefactor + 50, state));
                     this.stateNumbers.add(Integer.parseInt(str.substring(6, 7)));
@@ -791,6 +749,7 @@ public class GuiController {
                     this.assigmentState = this.assignments.get(Integer.parseInt(str.substring(6, 7)));
                     this.conditions.put(Integer.parseInt(str.substring(6, 7)),new Hashtable<>());
                     this.conditionsState = this.conditions.get(Integer.parseInt(str.substring(6, 7)));
+                    this.conditionsOrder.add(new ArrayList<>());
                 }
 
                 str = br.readLine();
@@ -805,6 +764,7 @@ public class GuiController {
                         this.variableSize.put(name, Integer.parseInt(size));
                         this.variableType.put(name, type);
                         this.assigns.add(name);
+                        this.conditionRegSelect.getItems().addAll(type+" "+name);
                     }
                     String assgin0;
                     String assgin1 = "";
@@ -838,15 +798,17 @@ public class GuiController {
                     //if less than 17, this is a non conditional branch
                     if(str.length() < 17)
                     {
+                        this.conditionsOrder.get(state).add("NOCON");
                         this.conditionsState.put("NOCON",Integer.parseInt(str.substring(str.length()-1,str.length())));
                     }
                     //else there is a conditional branch
                     else{
-                        str = str.replace("Equals","=");
+                        str = str.replace("Equals","==");
                         str = str.replace("NotEquals","~=");
                         str = str.replace("GreaterThan",">");
                         str = str.replace("LessThan","<");
                         int startingIndex = (str.contains("Reg"))?str.indexOf("Reg"):str.indexOf("Var");
+                        this.conditionsOrder.get(state).add(str.substring(startingIndex,str.indexOf("State:")));
                         this.conditionsState.put(str.substring(startingIndex,str.indexOf("State:")),
                                 Integer.parseInt(str.substring(str.length()-1,str.length())));
                     }
@@ -945,14 +907,20 @@ public class GuiController {
                         break;
 
                     case 2:
-                        label = "=";
+                        label = "==";
                         break;
 
                 }
             }
             //break the substrings
-            condition1 = str.substring(0, str.indexOf(label.charAt(0)));
+            condition1 = str.substring(0, str.indexOf(label.charAt(0))).replaceAll("Reg","Reg ")
+                    .replaceAll("Var","Var ");
             condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length());
+            //removes the extra == if label is that
+            if(label.equals("=="))
+                condition2=condition2.substring(1,condition2.length());
+
+            this.conditionRegSelect.getSelectionModel().select(this.conditionRegSelect.getItems().indexOf(condition1));
             this.conditiontext2.setText(condition2);
             this.conditionLabel.setText(label);
             this.conditionSpinner.getValueFactory().setValue(this.conditionsState.get(str));
@@ -1044,7 +1012,7 @@ public class GuiController {
                 this.conditionLabel.setText(">");
                 break;
             case "Equal to":
-                this.conditionLabel.setText("=");
+                this.conditionLabel.setText("==");
                 break;
             case "Not Equal to":
                 this.conditionLabel.setText("~=");
@@ -1080,11 +1048,12 @@ public class GuiController {
     //printing the file to a .txt
     void saveButton(ActionEvent event) {
         try{
-            PrintWriter print = new PrintWriter(this.fsmTitle);
+            PrintWriter print = new PrintWriter(this.fsmTitle + ".txt");
             if(this.didEdit)
                 this.fsmSTRING = generateFunction();
             print.print(this.fsmSTRING);
             this.didEdit = false;
+            print.close();
         }
         catch(FileNotFoundException e)
         {

@@ -116,7 +116,7 @@ public class Main extends Application {
             //making name assigments not editable
             controller.NameAssignmentsTextBox.setEditable(false);
             controller.stateNumbers.add(0);
-
+            controller.conditionsOrder.add(new ArrayList<>());
 
             primaryStage.setTitle("FSM Generator");
             primaryStage.setScene(new Scene(p, 600, 410));
