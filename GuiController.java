@@ -337,7 +337,8 @@ public class GuiController {
         String condition2 = "";
         //if radio button is selected
         if (this.conditionRadio.isSelected()) {
-            condition1 = this.conditionRegSelect.getValue();
+            condition1 = this.conditionRegSelect.getValue().replaceAll("Var ","Var").replaceAll
+                    ("Reg ","Reg");
             condition2 = this.conditiontext2.getText();
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
@@ -346,10 +347,30 @@ public class GuiController {
             //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
         }
-        this.conditionsOrder.get(this.stateNumSpinner.getValue()).add(condition1 + " " + this.conditionLabel.getText()
-                + " " + condition2);
-        this.conditionsState.put(condition1 + " " + this.conditionLabel.getText()
-                + " " + condition2, this.conditionSpinner.getValue());
+        int additional = 1;
+
+
+        //fixes problem, now can have multiple branching with same variable
+        if(this.conditionsState.containsKey(condition1 +  this.conditionLabel.getText()
+                + condition2))
+        {
+            while(this.conditionsState.containsKey(condition1 +  this.conditionLabel.getText()
+                    + condition2 + additional))
+            {
+                additional++;
+            }
+            this.conditionsState.put(condition1 +  this.conditionLabel.getText()
+                    +  condition2 + "%"+additional, this.conditionSpinner.getValue());
+            this.conditionsOrder.get(this.stateNumSpinner.getValue()).add(
+                    condition1 +  this.conditionLabel.getText()
+                    + condition2 + "%"+additional);
+        }
+        else {
+            this.conditionsOrder.get(this.stateNumSpinner.getValue()).add(condition1 + this.conditionLabel.getText()
+                    +  condition2);
+            this.conditionsState.put(condition1 + this.conditionLabel.getText()
+                    +  condition2, this.conditionSpinner.getValue());
+        }
 
         this.conditiontext2.clear();
         this.didEdit=true;
@@ -578,7 +599,10 @@ public class GuiController {
                 if (condition.equals("NOCON")) {
                     temp = "Next State State:" + this.conditions.get(state).get(condition) + "\n";
                 } else if(this.conditions.get(state).containsKey(condition)) {
-                    string.append("Next State if " + condition.replaceAll("Reg","Reg ").
+                    String conditiontemp = condition;
+                    if(condition.charAt(condition.length()-2)=='%')
+                        conditiontemp =condition.substring(0,condition.length()-2);
+                    string.append("Next State if " + conditiontemp.replaceAll("Reg","Reg ").
                             replaceAll("Var","Var ") +
                             " State:" + this.conditions.get(state).get(condition) + "\n");
                 }
@@ -808,9 +832,20 @@ public class GuiController {
                         str = str.replace("GreaterThan",">");
                         str = str.replace("LessThan","<");
                         int startingIndex = (str.contains("Reg"))?str.indexOf("Reg"):str.indexOf("Var");
-                        this.conditionsOrder.get(state).add(str.substring(startingIndex,str.indexOf("State:")));
-                        this.conditionsState.put(str.substring(startingIndex,str.indexOf("State:")),
-                                Integer.parseInt(str.substring(str.length()-1,str.length())));
+                        String str2 = str.substring(startingIndex,str.indexOf("State:"));
+                        //fixes, now possible to have multiple conditional assigments
+                        int offset = 1;
+                        if(conditionsOrder.get(state).contains(str.substring(startingIndex,str.indexOf("State:")))) {
+                            while (conditionsOrder.get(state).contains(str2 + offset)) offset++;
+                            this.conditionsOrder.get(state).add(str2+"%"+offset);
+                            this.conditionsState.put(str2+"%"+offset,
+                                    Integer.parseInt(str.substring(str.length()-1,str.length())));
+                        }
+                        else {
+                            this.conditionsOrder.get(state).add(str2);
+                            this.conditionsState.put(str.substring(startingIndex, str.indexOf("State:")),
+                                    Integer.parseInt(str.substring(str.length() - 1, str.length())));
+                        }
                     }
                     str = br.readLine();
                 }
@@ -912,10 +947,15 @@ public class GuiController {
 
                 }
             }
+            //only needed if there is a number at the end of condition 2, which only happens
+            //if the condition is assigned more than one
+            int offfset = 0;
+            if(str.charAt(str.length()-2)=='%') offfset=2;
             //break the substrings
             condition1 = str.substring(0, str.indexOf(label.charAt(0))).replaceAll("Reg","Reg ")
                     .replaceAll("Var","Var ");
-            condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length());
+
+            condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length()-offfset);
             //removes the extra == if label is that
             if(label.equals("=="))
                 condition2=condition2.substring(1,condition2.length());
@@ -1089,6 +1129,7 @@ public class GuiController {
             int state = this.stateNumSpinner.getValue();
             this.assignments.put(state, new Hashtable<>());
             this.conditions.put(state, new Hashtable<>());
+            this.conditionsOrder.add(new ArrayList<>());
             for (String str : this.assigns) {
                 this.assignments.get(state).put(str, "");
             }
@@ -1194,6 +1235,18 @@ public class GuiController {
 
         }
 
+    }
+
+    public boolean isInt(String str)
+    {
+        try {
+            Integer.parseInt(str);
+            return true;
+        }
+
+        catch(Exception e) {
+            return false;
+        }
     }
 
 }
