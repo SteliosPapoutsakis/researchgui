@@ -81,12 +81,11 @@
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="127.0" prefWidth="598.0">
                            <children>
-                              <Button fx:id="generateButton" layoutX="513.0" layoutY="26.0" mnemonicParsing="false" onAction="#generate" prefHeight="45.0" prefWidth="71.0" text="Generate" />
-                              <Button fx:id="deletStateButton" layoutX="317.0" layoutY="26.0" mnemonicParsing="false" onAction="#deleteStateButton" prefHeight="45.0" prefWidth="85.0" text="Delete State" />
-                              <Button fx:id="saevFSMButton" layoutX="228.0" layoutY="26.0" mnemonicParsing="false" onAction="#saveButton" prefHeight="45.0" prefWidth="71.0" text="Save FSM" />
-                              <TextField fx:id="loadTextbox" layoutX="112.0" layoutY="37.0" prefHeight="25.0" prefWidth="98.0" />
-                              <Button fx:id="loadFSMButton" layoutX="23.0" layoutY="37.0" mnemonicParsing="false" onAction="#loadButton" prefHeight="25.0" prefWidth="74.0" text="Load FSM" />
-                              <Button fx:id="loadStateButton" layoutX="422.0" layoutY="26.0" mnemonicParsing="false" onAction="#loadStateButton" prefHeight="45.0" prefWidth="74.0" text="Load State" />
+                              <Button fx:id="generateButton" layoutX="450.0" layoutY="26.0" mnemonicParsing="false" onAction="#generate" prefHeight="45.0" prefWidth="82.0" text="Generate" />
+                              <Button fx:id="deletStateButton" layoutX="250.0" layoutY="26.0" mnemonicParsing="false" onAction="#deleteStateButton" prefHeight="45.0" prefWidth="82.0" text="Delete State" />
+                              <Button fx:id="saevFSMButton" layoutX="150.0" layoutY="26.0" mnemonicParsing="false" onAction="#saveButton" prefHeight="45.0" prefWidth="82.0" text="Save FSM" />
+                              <Button fx:id="loadFSMButton" layoutX="50.0" layoutY="26.0" mnemonicParsing="false" onAction="#loadButton" prefHeight="45.0" prefWidth="82.0" text="Load FSM" />
+                              <Button fx:id="loadStateButton" layoutX="350.0" layoutY="26.0" mnemonicParsing="false" onAction="#loadStateButton" prefHeight="45.0" prefWidth="82.0" text="Load State" />
                            </children>
                         </AnchorPane>
                      </items>

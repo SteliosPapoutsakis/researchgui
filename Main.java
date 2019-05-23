@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -27,6 +28,9 @@ public class Main extends Application {
 
             //getting the controller
             GuiController controller = loader.getController();
+
+            controller.setStage(primaryStage);
+            controller.load.setInitialDirectory(new File(System.getProperty("user.dir")));
 
             //set on click listener for canvis
             controller.canvas.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {

@@ -64,6 +64,8 @@ public class drawFSM {
         if (state1.getStateNum() == state2.getStateNum()) {
             g.setStroke(Color.BLACK);
             g.strokeArc(state1.getX(), state1.getY() - 50, 30, 45, 0, 360, ArcType.OPEN);
+            g.strokeLine(state1.getX()+15,state1.getY()-50,state1.getX()+10,state1.getY()-53);
+            g.strokeLine(state1.getX()+15,state1.getY()-50,state1.getX()+10,state1.getY()-47);
             return;
         }
         //else we have to draw an arc

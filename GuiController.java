@@ -13,6 +13,8 @@ import java.net.URL;
 import java.util.*;
 
 import Framework.RunProgram;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 
 public class GuiController {
@@ -57,6 +59,13 @@ public class GuiController {
     @FXML
     protected TextField conditiontext2;
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    private Stage stage;
+
+
 
 
     @FXML
@@ -64,6 +73,8 @@ public class GuiController {
 
     @FXML
     protected ComboBox<String> conditionRegSelect;
+
+   protected FileChooser load = new FileChooser();
 
 
     @FXML
@@ -124,8 +135,7 @@ public class GuiController {
     protected Label fLabel;
 
 
-    @FXML
-    private TextField loadTextbox;
+
 
 
 
@@ -712,8 +722,8 @@ public class GuiController {
 
     @FXML
     void loadButton(ActionEvent event) {
-        String file = loadTextbox.getText();
         try {
+            File file = load.showOpenDialog(this.stage);
             BufferedReader br = new BufferedReader(new FileReader(file));
             br.readLine();
             String str = br.readLine();
@@ -1088,7 +1098,15 @@ public class GuiController {
     //printing the file to a .txt
     void saveButton(ActionEvent event) {
         try{
-            PrintWriter print = new PrintWriter(this.fsmTitle + ".txt");
+            //got from here http://java-buddy.blogspot.com/2012/05/save-file-with-javafx-filechooser.html
+            //Set extension filter
+            FileChooser.ExtensionFilter extFilter =
+                    new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+            load.getExtensionFilters().add(extFilter);
+
+            //Show save file dialog
+            File file = load.showSaveDialog(stage);
+            PrintWriter print = new PrintWriter(file);
             if(this.didEdit)
                 this.fsmSTRING = generateFunction();
             print.print(this.fsmSTRING);
