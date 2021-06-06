@@ -23,7 +23,7 @@ public class Main extends Application {
         try {
 
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../gui.fxml"));
             Parent p = loader.load();
 
             //getting the controller

@@ -2,14 +2,8 @@ package sample;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
-import javafx.scene.text.Font;
-import org.omg.CORBA.MARSHAL;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;

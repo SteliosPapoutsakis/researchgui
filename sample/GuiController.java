@@ -4,12 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 
-import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 
 import Framework.RunProgram;
@@ -38,6 +35,7 @@ public class GuiController {
     protected Hashtable<String, Integer> conditionsState;
     protected ArrayList<DrawState> states = new ArrayList<>();
     protected ArrayList<ArrayList<String>> conditionsOrder = new ArrayList<>();
+
 
 
     private int indexInput = 0;
@@ -353,6 +351,7 @@ public class GuiController {
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
             this.didEdit = true;
+            this.conditionsOrder.get(this.stateNumSpinner.getValue()).add("NOCON");
             // add the next state to the drawing fsm to be drawn
             //  this.states.get(this.stateNumSpinner.getValue()).getNextStates().add(this.conditionSpinner.getValue());
             return;
