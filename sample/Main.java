@@ -86,8 +86,8 @@ public class Main extends Application {
             controller.operatorsMenu.getItems().addAll("-");
             controller.operatorsMenu.getItems().addAll("*");
             controller.operatorsMenu.getItems().addAll("/");
-            controller.operatorsMenu.getItems().addAll("&&");
-
+            controller.operatorsMenu.getItems().addAll("&");
+            controller.operatorsMenu.getItems().addAll("|");
 
             // set spinner values help from https://o7planning.org/en/11185/javafx-spinner-tutorial
             SpinnerValueFactory<Integer> sizeInOut =

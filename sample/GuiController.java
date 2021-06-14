@@ -348,6 +348,9 @@ public class GuiController {
             condition1 = this.conditionRegSelect.getValue().replaceAll("Var ","Var").replaceAll
                     ("Reg ","Reg");
             condition2 = this.conditiontext2.getText();
+            // check to see if condition is a variable/reg
+            if (this.variableType.containsKey(condition2))
+                condition2 = this.variableType.get(condition2)+condition2;
         } else {
             this.conditionsState.put("NOCON", this.conditionSpinner.getValue());
             this.didEdit = true;
@@ -412,10 +415,14 @@ public class GuiController {
             this.Operator.setVisible(true);
             this.Assign2TextBox.setVisible(true);
             this.Operator.setText("-");
-        } else if (this.operatorsMenu.getValue().equals("&&")) {
+        } else if (this.operatorsMenu.getValue().equals("&")) {
             this.Operator.setVisible(true);
             this.Assign2TextBox.setVisible(true);
-            this.Operator.setText("&&");
+            this.Operator.setText("&");
+        } else if (this.operatorsMenu.getValue().equals("|")) {
+            this.Operator.setVisible(true);
+            this.Assign2TextBox.setVisible(true);
+            this.Operator.setText("|");
         }
     }
 
@@ -474,15 +481,20 @@ public class GuiController {
         if (this.conditionRadio.isSelected()) {
             String condition1 = "";
             String condition2 = "";
-            condition1 = this.conditionRegSelect.getValue();
+            condition1 = this.conditionRegSelect.getValue().replaceAll("Var ","Var").replaceAll
+                    ("Reg ","Reg");
 
             condition2 = this.conditiontext2.getText();
-            this.conditionsState.remove(condition1 + " " + this.conditionLabel.getText()
-                    + " " + condition2);
+            this.conditionsState.remove(condition1 + this.conditionLabel.getText()
+                    +  condition2);
+            this.conditionsOrder.get(this.stateNumSpinner.getValue()).remove(condition1 + this.conditionLabel.getText()
+                    +  condition2);
         } else {
             this.conditionsState.remove("NOCON");
+            this.conditionsOrder.get(this.stateNumSpinner.getValue()).remove("NOCON");
         }
         this.didEdit=true;
+
 
 
     }
@@ -627,7 +639,7 @@ public class GuiController {
     @FXML
     //assigns the value of the register to itself, a "hold state"
     void holdAssign(ActionEvent event) {
-        this.assigmentState.put(this.NameAssignmentsTextBox.getText(), this.variableType.get(this.NameAssignmentsTextBox.getText())+
+        this.assigmentState.put(this.NameAssignmentsTextBox.getText(), this.variableType.get(this.NameAssignmentsTextBox.getText())+" "+
         this.NameAssignmentsTextBox.getText());
         assignPutData();
     }
@@ -804,8 +816,8 @@ public class GuiController {
                     String op = str.contains("*") ? "*" :
                             (str.contains("+") ? "+" : (str.contains("-") ? "-" :
                                     (str.contains("/") ? "/" :
-                                            (str.contains("&&") ? "&&"
-                                                    : ""))));
+                                            (str.contains("&") ? "&"
+                                                    :  (str.contains("|") ? "|": "")))));
                     if (op.length() == 0) {
                         assgin0 = str.substring(str.indexOf("=") + 1, str.length());
                         assgin0 = assgin0.replaceAll("Reg", "Reg ");
@@ -964,7 +976,8 @@ public class GuiController {
             condition1 = str.substring(0, str.indexOf(label.charAt(0))).replaceAll("Reg","Reg ")
                     .replaceAll("Var","Var ");
 
-            condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length()-offfset);
+            condition2 = str.substring(str.indexOf(label.charAt(label.length() - 1)) + 1, str.length()-offfset).replaceAll("Reg","Reg ")
+                    .replaceAll("Var","Var ");
             //removes the extra == if label is that
             if(label.equals("=="))
                 condition2=condition2.substring(1,condition2.length());
@@ -1203,16 +1216,12 @@ public class GuiController {
 
         char inQuestion = '+';
         boolean containAny = false;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             if (str.contains(inQuestion + "")) {
                 int indexcut = str.indexOf(inQuestion) + 1;
                 String additionToOpp = "";
-                //fixes the issue of adding the double '&'
-                if (inQuestion == '&')
-                {
-                    indexcut++;
-                    additionToOpp = "&";
-                }
+
+
                 containAny = true;
                 String str1 = str.substring(0, str.indexOf(inQuestion));
                 String str2 = str.substring(indexcut, str.length());
@@ -1241,6 +1250,9 @@ public class GuiController {
                     break;
                 case 3:
                     inQuestion = '&';
+                    break;
+                case 4:
+                    inQuestion = '|';
                     break;
             }
         }
