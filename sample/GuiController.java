@@ -13,6 +13,8 @@ import Framework.RunProgram;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import static jdk.nashorn.internal.objects.Global.print;
+
 
 public class GuiController {
 /***
@@ -148,62 +150,140 @@ public class GuiController {
         //inputing values
     void InputButton(ActionEvent event) {
 
+        if (this.inputOutputMenu.getValue()!=null) {
+            //checking to see if input
+            if (this.nameVarRegTextBox.getText().length() > 0 &&
+                    (this.varRadio.isSelected() || this.regRadio.isSelected())) {
 
-        //checking to see if input
-        if (this.nameVarRegTextBox.getText().length() > 0 &&
-                (this.varRadio.isSelected() || this.regRadio.isSelected())) {
+                if (this.inputOutputMenu.getValue().equals("Input")) {
+                    //if an output or reg already exists with the same name, do not input it
+                    if (this.registers.contains(this.nameVarRegTextBox.getText()) ||
+                            this.outputs.contains(this.nameVarRegTextBox.getText())) {
+                        Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
+                        Thread t = new Thread(w);
+                        t.run();
+                        this.nameVarRegTextBox.clear();
+                        return;
+                    }
 
-            if (this.inputOutputMenu.getValue().equals("Input")) {
-                //if an output or reg already exists with the same name, do not input it
-                if (this.registers.contains(this.nameVarRegTextBox.getText()) ||
-                        this.outputs.contains(this.nameVarRegTextBox.getText())) {
-                    Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
-                    Thread t = new Thread(w);
-                    t.run();
-                    this.nameVarRegTextBox.clear();
-                    return;
-                }
+                    //if a one bit value, add to the list of conditional values
+                    if (this.sizeInOutSpinner.getValue() == 1) {
+                        this.conditionRegSelect.getItems().addAll("Var " + this.nameVarRegTextBox.getText());
+                    }
 
-                //if a one bit value, add to the list of conditional values
-                if(this.sizeInOutSpinner.getValue() == 1)
-                {
-                    this.conditionRegSelect.getItems().addAll("Var " + this.nameVarRegTextBox.getText());
-                }
-
-                //puts values of an input in tables and arrayList
-                if (!this.inputs.contains(this.nameVarRegTextBox.getText()))
-                    this.inputs.add(this.nameVarRegTextBox.getText());
-                this.variableType.put(this.nameVarRegTextBox.getText(), "Var");
-                this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
-            //check if output
-            } else if (this.inputOutputMenu.getValue().equals("Output")) {
-
-                //check if a name is a dublicate
-                if (this.registers.contains(this.nameVarRegTextBox.getText()) ||
-                        this.inputs.contains(this.nameVarRegTextBox.getText())) {
-                    Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
-                    Thread t = new Thread(w);
-                    t.run();
-                    this.nameVarRegTextBox.clear();
-                    return;
-                }
-                //if an input or register removes it from list
-                this.inputs.remove(this.nameVarRegTextBox);
-                this.registers.remove(this.nameVarRegTextBox);
-
-
-                //puts vales of a output into tables and arrayList
-                if (!this.outputs.contains(this.nameVarRegTextBox.getText()))
-                    this.outputs.add(this.nameVarRegTextBox.getText());
-                if (this.varRadio.isSelected()) {
+                    //puts values of an input in tables and arrayList
+                    if (!this.inputs.contains(this.nameVarRegTextBox.getText()))
+                        this.inputs.add(this.nameVarRegTextBox.getText());
                     this.variableType.put(this.nameVarRegTextBox.getText(), "Var");
+                    this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
+                    //check if output
+                } else if (this.inputOutputMenu.getValue().equals("Output")) {
+
+                    //check if a name is a dublicate
+                    if (this.registers.contains(this.nameVarRegTextBox.getText()) ||
+                            this.inputs.contains(this.nameVarRegTextBox.getText())) {
+                        Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
+                        Thread t = new Thread(w);
+                        t.run();
+                        this.nameVarRegTextBox.clear();
+                        return;
+                    }
+                    //if an input or register removes it from list
+                    this.inputs.remove(this.nameVarRegTextBox);
+                    this.registers.remove(this.nameVarRegTextBox);
 
 
-                } else {
+                    //puts vales of a output into tables and arrayList
+                    if (!this.outputs.contains(this.nameVarRegTextBox.getText()))
+                        this.outputs.add(this.nameVarRegTextBox.getText());
+                    if (this.varRadio.isSelected()) {
+                        this.variableType.put(this.nameVarRegTextBox.getText(), "Var");
 
-                    // go through all reg to see if same size
-                    for (String str : this.outputs) {
+
+                    } else {
+
+                        // go through all reg to see if same size
+                        for (String str : this.outputs) {
+                            if (str.equals(this.nameVarRegTextBox.getText())) continue;
+                            // sees if the output is a reg
+                            if (this.variableType.get(str).equals("Reg")) {
+                                if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
+                                    Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
+                                            "Size Warning");
+                                    Thread t = new Thread(w);
+                                    t.run();
+
+                                    //if we hit this get out of this method
+                                    this.outputs.remove(this.nameVarRegTextBox.getText());
+                                    this.nameVarRegTextBox.clear();
+                                    return;
+
+                                }
+                            }
+
+
+                        }
+                        // check in registers too
+
+                        for (String str : this.registers) {
+                            if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
+                                Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
+                                        "Size Warning");
+                                Thread t = new Thread(w);
+                                t.run();
+                                this.outputs.remove(this.nameVarRegTextBox.getText());
+                                this.nameVarRegTextBox.clear();
+                                return;
+
+
+                            }
+                        }
+                        this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
+                        //put the reg in the conditional values
+                        this.conditionRegSelect.getItems().addAll("Reg " + this.nameVarRegTextBox.getText());
+                    }
+                    this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
+
+                    //check if reg
+                } else if (this.inputOutputMenu.getValue().equals("Register")) {
+
+                    //check if a name is a dublicate
+                    if (this.outputs.contains(this.nameVarRegTextBox.getText()) ||
+                            this.inputs.contains(this.nameVarRegTextBox.getText())) {
+                        Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
+                        Thread t = new Thread(w);
+                        t.run();
+                        this.nameVarRegTextBox.clear();
+                        return;
+                    }
+                    //if an output or input removes it from list
+                    this.outputs.remove(this.nameVarRegTextBox);
+                    this.inputs.remove(this.nameVarRegTextBox);
+
+                    //puts values of an registers in tables and arrayList
+                    if (!this.registers.contains(this.nameVarRegTextBox.getText()))
+                        this.registers.add(this.nameVarRegTextBox.getText());
+
+
+                    // go through all regs to see if same size
+                    for (String str : this.registers) {
                         if (str.equals(this.nameVarRegTextBox.getText())) continue;
+                        if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
+                            Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
+                                    "Size Warning");
+                            Thread t = new Thread(w);
+                            t.run();
+
+                            //if we hit this get out of this method + remve from arrray
+                            this.registers.remove(this.nameVarRegTextBox.getText());
+                            this.nameVarRegTextBox.clear();
+                            return;
+
+                        }
+                    }
+
+                    // now check the output registers if inputing a reg
+                    for (String str : this.outputs) {
                         // sees if the output is a reg
                         if (this.variableType.get(str).equals("Reg")) {
                             if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
@@ -212,8 +292,8 @@ public class GuiController {
                                 Thread t = new Thread(w);
                                 t.run();
 
-                                //if we hit this get out of this method
-                                this.outputs.remove(this.nameVarRegTextBox.getText());
+                                //if we hit this get out of this method + remove from array
+                                this.registers.remove(this.nameVarRegTextBox.getText());
                                 this.nameVarRegTextBox.clear();
                                 return;
 
@@ -222,110 +302,36 @@ public class GuiController {
 
 
                     }
-                    // check in registers too
 
-                    for (String str : this.registers) {
-                        if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
-                            Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
-                                    "Size Warning");
-                            Thread t = new Thread(w);
-                            t.run();
-                            this.outputs.remove(this.nameVarRegTextBox.getText());
-                            this.nameVarRegTextBox.clear();
-                            return;
-
-
-                        }
-                    }
                     this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
-                    //put the reg in the conditional values
                     this.conditionRegSelect.getItems().addAll("Reg " + this.nameVarRegTextBox.getText());
-                }
-                this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
-
-            //check if reg
-            } else if (this.inputOutputMenu.getValue().equals("Register")) {
-
-                //check if a name is a dublicate
-                if (this.outputs.contains(this.nameVarRegTextBox.getText()) ||
-                        this.inputs.contains(this.nameVarRegTextBox.getText())) {
-                    Warnings w = new Warnings("You cannot have duplicate names", "Duplicate Name Warning");
-                    Thread t = new Thread(w);
-                    t.run();
-                    this.nameVarRegTextBox.clear();
-                    return;
-                }
-                //if an output or input removes it from list
-                this.outputs.remove(this.nameVarRegTextBox);
-                this.inputs.remove(this.nameVarRegTextBox);
-
-                //puts values of an registers in tables and arrayList
-                if (!this.registers.contains(this.nameVarRegTextBox.getText()))
-                    this.registers.add(this.nameVarRegTextBox.getText());
-
-
-                  // go through all regs to see if same size
-                for (String str : this.registers) {
-                    if (str.equals(this.nameVarRegTextBox.getText())) continue;
-                    if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
-                        Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
-                                "Size Warning");
-                        Thread t = new Thread(w);
-                        t.run();
-
-                        //if we hit this get out of this method + remve from arrray
-                        this.registers.remove(this.nameVarRegTextBox.getText());
-                        this.nameVarRegTextBox.clear();
-                        return;
-
-                    }
-                }
-
-                // now check the output registers if inputing a reg
-                for (String str : this.outputs) {
-                    // sees if the output is a reg
-                    if (this.variableType.get(str).equals("Reg")) {
-                        if (this.variableSize.get(str) != this.sizeInOutSpinner.getValue()) {
-                            Warnings w = new Warnings("You cannot have registers that are different sizes", "Register " +
-                                    "Size Warning");
-                            Thread t = new Thread(w);
-                            t.run();
-
-                            //if we hit this get out of this method + remove from array
-                            this.registers.remove(this.nameVarRegTextBox.getText());
-                            this.nameVarRegTextBox.clear();
-                            return;
-
-                        }
-                    }
-
+                    this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
 
                 }
-
-                this.variableType.put(this.nameVarRegTextBox.getText(), "Reg");
-                this.conditionRegSelect.getItems().addAll("Reg " + this.nameVarRegTextBox.getText());
-                this.variableSize.put(this.nameVarRegTextBox.getText(), this.sizeInOutSpinner.getValue());
-
+                //put the value in assigns if output or reg
+                if ((this.outputs.contains(this.nameVarRegTextBox.getText())
+                        || this.registers.contains(this.nameVarRegTextBox.getText()))
+                        && !(this.assigns.contains(this.nameVarRegTextBox.getText()))) {
+                    this.assigns.add(this.nameVarRegTextBox.getText());
+                    this.assigmentState.put(this.nameVarRegTextBox.getText(), "");
+                }
+                this.nameVarRegTextBox.clear();
             }
-            //put the value in assigns if output or reg
-            if ((this.outputs.contains(this.nameVarRegTextBox.getText())
-                    || this.registers.contains(this.nameVarRegTextBox.getText()))
-                    && !(this.assigns.contains(this.nameVarRegTextBox.getText()))) {
-                this.assigns.add(this.nameVarRegTextBox.getText());
-                this.assigmentState.put(this.nameVarRegTextBox.getText(), "");
-            }
-            this.nameVarRegTextBox.clear();
+
+            //resets the index for viewing inputs
+            this.indexInput = 0;
+            this.indexOutput = 0;
+            this.indexRegister = 0;
+            this.didEdit = true;
+
+
+            if (!this.assigns.isEmpty())
+                this.NameAssignmentsTextBox.setText(this.assigns.get(0));
+        } else {
+            Warnings w = new Warnings("You Must Select a Variable Type", "No Variable Type");
+            Thread t = new Thread(w);
+            t.run();
         }
-
-        //resets the index for viewing inputs
-        this.indexInput = 0;
-        this.indexOutput = 0;
-        this.indexRegister = 0;
-        this.didEdit = true;
-
-
-        if (!this.assigns.isEmpty())
-            this.NameAssignmentsTextBox.setText(this.assigns.get(0));
     }
 
 
@@ -553,26 +559,39 @@ public class GuiController {
     void deleteStateButton(ActionEvent event) {
         //for every state ahead edit the number to be one state smaller
         int size = states.size();
-        for(int i = stateNumSpinner.getValue()+1; i < size;i++)
-        {
-            this.assignments.put(i-1,this.assignments.get(i));
-            this.conditions.put(i-1,this.conditions.get(i));
-            this.states.get(i).setStateNum(i-1);
+        if (size > 1) {
+            for (int i = stateNumSpinner.getValue() + 1; i < size; i++) {
+                this.assignments.put(i - 1, this.assignments.get(i));
+                // iterate through
+                this.conditions.put(i - 1, this.conditions.get(i));
+                this.states.get(i).setStateNum(i - 1);
 
+            }
+
+            // iterate through every condition, and subtract one from each state that was higher or equal to
+            // the one begin deleted
+            for(int i = 0; i < this.conditions.size(); i++) {
+                for (String condition: this.conditions.get(i).keySet()) {
+                    int statenum = this.conditions.get(i).get(condition);
+                    if (statenum >= stateNumSpinner.getValue())
+                        this.conditions.get(i).put(condition, statenum -1);
+
+                }
+            }
+
+            //setting everything up after the deletion
+            this.states.remove(states.size()-1);
+            this.assignments.remove(size - 1);
+            this.conditions.remove(size - 1);
+            this.assigmentState = this.assignments.get(stateNumSpinner.getValue());
+            this.conditionsState = this.conditions.get(stateNumSpinner.getValue());
+
+            this.indexAssign = -1;
+            this.indexConditions = -1;
+            assignPutData();
+            nextCondition(null);
+            stateNumbers.remove(stateNumbers.size() - 1);
         }
-
-        //setting everything up after the deletion
-        this.states.remove(stateNumSpinner.getValue());
-        this.assignments.remove(size-1);
-        this.conditions.remove(size-1);
-        this.assigmentState = this.assignments.get(stateNumSpinner.getValue());
-        this.conditionsState = this.conditions.get(stateNumSpinner.getValue());
-
-        this.indexAssign=-1;
-        this.indexConditions=-1;
-        assignPutData();
-        nextCondition(null);
-        stateNumbers.remove(stateNumbers.size()-1);
 
     }
 
