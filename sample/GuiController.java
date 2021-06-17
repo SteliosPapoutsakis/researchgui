@@ -573,12 +573,18 @@ public class GuiController {
             for(int i = 0; i < this.conditions.size(); i++) {
                 for (String condition: this.conditions.get(i).keySet()) {
                     int statenum = this.conditions.get(i).get(condition);
-                    if (statenum >= stateNumSpinner.getValue())
+                    if (statenum > stateNumSpinner.getValue())
                         this.conditions.get(i).put(condition, statenum -1);
+                    else if(statenum == stateNumSpinner.getValue())
+                        this.conditions.get(i).remove(condition);
 
                 }
             }
 
+            // check to see if the state deleted was the late one
+            // if so, decrement one
+            if (stateNumSpinner.getValue() == size-1)
+                stateNumSpinner.decrement(1);
             //setting everything up after the deletion
             this.states.remove(states.size()-1);
             this.assignments.remove(size - 1);
@@ -589,7 +595,7 @@ public class GuiController {
             this.indexAssign = -1;
             this.indexConditions = -1;
             assignPutData();
-            nextCondition(null);
+            nextConditionHelper();
             stateNumbers.remove(stateNumbers.size() - 1);
         }
 
@@ -934,15 +940,14 @@ public class GuiController {
         assignPutData();
 
     }
-
-    @FXML
-    void nextCondition(ActionEvent event) {
+    private void nextConditionHelper() {
+        if(this.conditionsState.size()==0)
+            return;
         this.indexConditions++;
         if (this.indexConditions >= this.conditionsState.keySet().size()) {
             this.indexConditions = 0;
         }
-        if(this.conditionsState.size()==0)
-            return;
+
 
         String str = (String) (this.conditionsState.keySet().toArray())[this.indexConditions];
         if (str.equals("NOCON")) {
@@ -1007,6 +1012,11 @@ public class GuiController {
             this.conditionSpinner.getValueFactory().setValue(this.conditionsState.get(str));
         }
 
+    }
+
+    @FXML
+    void nextCondition(ActionEvent event) {
+        nextConditionHelper();
     }
 
     @FXML
@@ -1223,66 +1233,69 @@ public class GuiController {
         this.Assign2TextBox.setVisible(false);
         this.Assign1TextBox.clear();
 
-        //incrment index to see assignemtns
-        this.indexAssign++;
-        if (this.indexAssign == this.assigns.size())
-            this.indexAssign = 0;
-        this.NameAssignmentsTextBox.setText(this.assigns.get(this.indexAssign));
-        String str = this.assigmentState.get(this.assigns.get(this.indexAssign));
-        // if there is no info for this var, stop here
-        if (str == null) return;
+        // if there are no variables, stop
+        if (this.assigns.size() > 0) {
+
+            //incrment index to see assignemtns
+            this.indexAssign++;
+            if (this.indexAssign == this.assigns.size())
+                this.indexAssign = 0;
+            this.NameAssignmentsTextBox.setText(this.assigns.get(this.indexAssign));
+            String str = this.assigmentState.get(this.assigns.get(this.indexAssign));
+            // if there is no info for this var, stop here
+            if (str == null) return;
 
 
-        char inQuestion = '+';
-        boolean containAny = false;
-        for (int i = 0; i < 6; i++) {
-            if (str.contains(inQuestion + "")) {
-                int indexcut = str.indexOf(inQuestion) + 1;
-                String additionToOpp = "";
+            char inQuestion = '+';
+            boolean containAny = false;
+            for (int i = 0; i < 6; i++) {
+                if (str.contains(inQuestion + "")) {
+                    int indexcut = str.indexOf(inQuestion) + 1;
+                    String additionToOpp = "";
 
 
-                containAny = true;
-                String str1 = str.substring(0, str.indexOf(inQuestion));
-                String str2 = str.substring(indexcut, str.length());
+                    containAny = true;
+                    String str1 = str.substring(0, str.indexOf(inQuestion));
+                    String str2 = str.substring(indexcut, str.length());
 
-                this.Assign1TextBox.setText(str1);
+                    this.Assign1TextBox.setText(str1);
 
 
-                this.Operator.setText(inQuestion + additionToOpp);
-                this.Assign2TextBox.setText(str2);
-                this.Operator.setVisible(true);
-                this.Assign2TextBox.setVisible(true);
-                break;
+                    this.Operator.setText(inQuestion + additionToOpp);
+                    this.Assign2TextBox.setText(str2);
+                    this.Operator.setVisible(true);
+                    this.Assign2TextBox.setVisible(true);
+                    break;
+                }
+
+                // do for all chars
+
+                switch (i) {
+                    case 0:
+                        inQuestion = '-';
+                        break;
+                    case 1:
+                        inQuestion = '*';
+                        break;
+                    case 2:
+                        inQuestion = '/';
+                        break;
+                    case 3:
+                        inQuestion = '&';
+                        break;
+                    case 4:
+                        inQuestion = '|';
+                        break;
+                }
             }
 
-            // do for all chars
+            if (!containAny) {
+                this.Assign1TextBox.setText(str);
+                this.Operator.setVisible(false);
+                this.Assign2TextBox.setVisible(false);
 
-            switch (i) {
-                case 0:
-                    inQuestion = '-';
-                    break;
-                case 1:
-                    inQuestion = '*';
-                    break;
-                case 2:
-                    inQuestion = '/';
-                    break;
-                case 3:
-                    inQuestion = '&';
-                    break;
-                case 4:
-                    inQuestion = '|';
-                    break;
             }
         }
-
-        if (!containAny) {
-            this.Assign1TextBox.setText(str);
-            this.Operator.setVisible(false);
-            this.Assign2TextBox.setVisible(false);
-
-        }
-
     }
 
     public boolean isInt(String str)
