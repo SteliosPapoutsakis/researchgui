@@ -30,7 +30,7 @@ public class drawFSM {
             for (int nextState : conditionsMap.get(state.getStateNum()).values()) {
 
                 //if the next state has been defined yet, dont draw it
-                if (nextState > drawStates.size()) continue;
+                if (nextState > drawStates.size()-1) continue;
                 // if both the states are on the same line
                 if ((state.getStateNum() < 26 && drawStates.get(nextState).getStateNum()< 26)
                         ||(state.getStateNum() > 25 && drawStates.get(nextState).getStateNum() > 25)) {
